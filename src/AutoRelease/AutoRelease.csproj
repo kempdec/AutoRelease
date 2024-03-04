@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>KempDec.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>KempDec.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageId>AutoRelease</PackageId>
+    <Title>Auto Release</Title>
+    <Version>0.1.0</Version>
+    <Authors>KempDec</Authors>
+    <Company>KempDec Brasil Ltda.</Company>
+    <Product>Auto Release</Product>
+    <Description>Gere releases automaticamente do seu projeto no GitHub usando o Auto Release.</Description>
+    <Copyright>2024 © KempDec Brasil Ltda.</Copyright>
+    <PackageProjectUrl>https://github.com/kempdec/AutoRelease</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kempdec/AutoRelease</RepositoryUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>github;release;release-automation;</PackageTags>
+    <PackAsTool>True</PackAsTool>
+    <ToolCommandName>autorelease</ToolCommandName>
+    <PackageOutputPath>..\..\published</PackageOutputPath>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
