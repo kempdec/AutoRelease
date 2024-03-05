@@ -1,6 +1,6 @@
 # Auto Release
 
-Gere releases automaticamente do seu projeto no GitHub usando o Auto Release.
+Gere automaticamente releases do seu projeto no GitHub usando o Auto Release.
 
 ## Instalação
 

@@ -14,7 +14,7 @@
     <Authors>KempDec</Authors>
     <Company>KempDec Brasil Ltda.</Company>
     <Product>Auto Release</Product>
-    <Description>Gere releases automaticamente do seu projeto no GitHub usando o Auto Release.</Description>
+    <Description>Gere automaticamente releases do seu projeto no GitHub usando o Auto Release.</Description>
     <Copyright>2024 © KempDec Brasil Ltda.</Copyright>
     <PackageProjectUrl>https://github.com/kempdec/AutoRelease</PackageProjectUrl>
     <RepositoryUrl>https://github.com/kempdec/AutoRelease</RepositoryUrl>
