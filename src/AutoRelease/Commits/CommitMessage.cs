@@ -22,7 +22,7 @@ internal class CommitMessage
 
         if (messages.Length >= 2)
         {
-            ICommitMessageType? type = types is not null
+            ICommitMessageType? type = types is { Count: > 0 }
                 ? types.SingleOrDefault(e => e.Key == messages[0])
                 : GetType(messages[0]);
 

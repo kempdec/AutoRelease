@@ -72,6 +72,11 @@ internal class AutoReleaseCommand : RootCommand
                 continue;
             }
 
+            if (builder.Length > 0)
+            {
+                builder.AppendLine();
+            }
+
             builder.AppendLine($"## {commitMessageGroup.Key.Label}");
             builder.AppendLine();
 
