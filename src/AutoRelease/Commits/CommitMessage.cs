@@ -1,4 +1,7 @@
-﻿namespace KempDec.AutoRelease.Commits;
+﻿using KempDec.AutoRelease.Commits.Types;
+using KempDec.StarterDotNet.Reflection;
+
+namespace KempDec.AutoRelease.Commits;
 
 /// <summary>
 /// Representa uma mensagem de commit.
@@ -10,7 +13,8 @@ internal class CommitMessage
     /// </summary>
     /// <param name="message">A mensagem de commit. É ideal que a mensagem de commit esteja estruturada da seguinte
     /// forma: &lt;tipo&gt;: &lt;descrição&gt;.</param>
-    public CommitMessage(string message)
+    /// <param name="types">Os tipos de mensagem de commit.</param>
+    public CommitMessage(string message, List<CommitMessageType>? types = null)
     {
         OriginMessage = message;
 
@@ -18,11 +22,16 @@ internal class CommitMessage
 
         if (messages.Length >= 2)
         {
-            Type = messages[0];
+            ICommitMessageType? type = types is not null
+                ? types.SingleOrDefault(e => e.Key == messages[0])
+                : GetType(messages[0]);
+
+            Type = type ?? new DefaultCommitMessageType();
             Description = messages[1];
         }
         else
         {
+            Type = new DefaultCommitMessageType();
             Description = messages[0];
         }
     }
@@ -35,12 +44,24 @@ internal class CommitMessage
     /// <summary>
     /// Obtém o tipo da mensagem de commit.
     /// </summary>
-    public string? Type { get; }
+    public ICommitMessageType Type { get; }
 
     /// <summary>
     /// Obtém a descrição da mensagem de commit.
     /// </summary>
     public string Description { get; }
+
+    /// <summary>
+    /// Obtém a representação do tipo da mensagem de commit especificado.
+    /// </summary>
+    /// <param name="type">O tipo da mensagem de commit.</param>
+    /// <returns>A representação do tipo da mensagem de commit especificado.</returns>
+    private static ICommitMessageType? GetType(string type)
+    {
+        IEnumerable<ICommitMessageType?> types = AssemblyHelper.GetAllClassesWithInterface<ICommitMessageType>();
+
+        return types.SingleOrDefault(e => e?.Key == type);
+    }
 
     /// <inheritdoc/>
     public override string ToString() => OriginMessage;
