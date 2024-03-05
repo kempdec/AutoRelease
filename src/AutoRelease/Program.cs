@@ -1,1 +1,1 @@
-﻿
+﻿await AutoReleaseCommand.InvokeAsync(args);

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AutoRelease": {
+      "commandName": "Project",
+      "commandLineArgs": "--token %AutoRelease_GitHubToken%\r\n--repo %AutoRelease_Repo%"
+    }
+  }
+}
