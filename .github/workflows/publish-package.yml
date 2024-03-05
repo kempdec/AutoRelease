@@ -1,0 +1,36 @@
+name: Publicar pacote 
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: self-hosted
+    shell: powershell
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet_version: 8.x
+
+      - name: Restaurar dependências
+        run: dotnet restore
+
+      - name: Gerar pacote
+        run: dotnet pack
+
+      - name: Carregar o pacote no NuGet
+        run: |
+          cd published/
+          dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+
+      - name: Carregar o pacote no GitHub
+        run: |
+          cd published/
+          dotnet nuget push *.nupkg --api-key ${{ secrets.PACKAGE_TOKEN }} --source "https://nuget.pkg.github.com/kempdec/index.json" --skip-duplicate
