@@ -1,6 +1,6 @@
 ﻿using System.CommandLine.Parsing;
 
-namespace KempDec.AutoRelease;
+namespace KempDec.AutoRelease.Extensions;
 
 /// <summary>
 /// Classe com métodos extensivos para <see cref="ArgumentResult"/>.

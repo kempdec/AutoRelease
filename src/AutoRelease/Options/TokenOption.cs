@@ -1,4 +1,5 @@
-﻿using System.CommandLine;
+﻿using KempDec.AutoRelease.Extensions;
+using System.CommandLine;
 
 namespace KempDec.AutoRelease.Options;
 
