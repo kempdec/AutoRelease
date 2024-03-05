@@ -8,7 +8,10 @@ on:
 jobs:
   publish:
     runs-on: self-hosted
-    shell: powershell
+    
+    defaults:
+      run:
+        shell: powershell
 
     steps:
       - name: Checkout do repositório
