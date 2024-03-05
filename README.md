@@ -2,11 +2,19 @@
 
 Gere releases automaticamente do seu projeto no GitHub usando o Auto Release.
 
+## Instala√ß√£o
+
+Instale a ferramenta a partir do SDK do .NET.
+
+``` powershell
+dotnet tool install -g autorelease
+```
+
 ## Autores
 
-- [KempDec](https://kempdec.com) - Mantedora do projeto de cÛdigo aberto.
-- [VinÌcius Lima](https://github.com/viniciusxdl) - Desenvolvedor .NET C#.
+- [KempDec](https://kempdec.com) - Mantedora do projeto de c√≥digo aberto.
+- [Vin√≠cius Lima](https://github.com/viniciusxdl) - Desenvolvedor .NET C#.
 
-## LicenÁa
+## Licen√ßa
 
 [MIT](https://github.com/kempdec/AutoRelease/blob/main/LICENSE.txt)
