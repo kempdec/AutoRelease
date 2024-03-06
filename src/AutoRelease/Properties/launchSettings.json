@@ -2,7 +2,7 @@
   "profiles": {
     "AutoRelease": {
       "commandName": "Project",
-      "commandLineArgs": "--token %AutoRelease_GitHubToken%\r\n--repo %AutoRelease_Repo%\r\n--branch develop"
+      "commandLineArgs": "note\r\n--token %AutoRelease_GitHubToken%\r\n--repo %AutoRelease_Repo%\r\n--branch develop"
     }
   }
 }
