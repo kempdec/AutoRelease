@@ -21,13 +21,15 @@ internal class NoteSubCommand : Command
         var repo = new RepoOption();
         var branch = new BranchOption();
         var types = new TypesOption();
+        var replaces = new ReplacesOption();
 
         AddOption(token);
         AddOption(repo);
         AddOption(branch);
         AddOption(types);
+        AddOption(replaces);
 
-        this.SetHandler(HandleAsync, token, repo, branch, types);
+        this.SetHandler(HandleAsync, token, repo, branch, types, replaces);
     }
 
     /// <summary>
@@ -37,9 +39,10 @@ internal class NoteSubCommand : Command
     /// <param name="repo">O repositório que contém os commits no GitHub.</param>
     /// <param name="branch">O branch do repositório no GitHub.</param>
     /// <param name="types">Os tipos das mensagens de commit.</param>
+    /// <param name="replaces">As substituições do início das mensagens de commit.</param>
     /// <returns>A <see cref="Task"/> que representa a operação assíncrona.</returns>
     private async Task HandleAsync(string token, (string Owner, string Name) repo, string? branch,
-        List<CommitMessageType> types)
+        List<CommitMessageType> types, List<(string OldValue, string NewValue)> replaces)
     {
         GitHubClient github = GitHubClientHelper.Create(token);
         DateTimeOffset? since = null;
@@ -76,7 +79,7 @@ internal class NoteSubCommand : Command
         }
 
         var commitMessages = githubCommits
-            .Select(e => new CommitMessage(e.Commit.Message, types))
+            .Select(e => new CommitMessage(e.Commit.Message, types, replaces))
             .GroupBy(e => e.Type)
             .OrderBy(e => e.Key.Ordering)
             .ToList();
@@ -100,7 +103,7 @@ internal class NoteSubCommand : Command
 
             foreach (CommitMessage commitMessage in commitMessageGroup.ToList())
             {
-                builder.AppendLine($"- {commitMessage.Description}");
+                builder.AppendLine($"- {commitMessage.ReleaseDescription}");
             }
         }
 

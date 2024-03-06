@@ -14,7 +14,9 @@ internal class CommitMessage
     /// <param name="message">A mensagem de commit. É ideal que a mensagem de commit esteja estruturada da seguinte
     /// forma: &lt;tipo&gt;: &lt;descrição&gt;.</param>
     /// <param name="types">Os tipos de mensagem de commit.</param>
-    public CommitMessage(string message, List<CommitMessageType>? types = null)
+    /// <param name="replaces">As substituições do início das mensagens de commit.</param>
+    public CommitMessage(string message, List<CommitMessageType>? types = null,
+        List<(string OldValue, string NewValue)>? replaces = null)
     {
         OriginMessage = message;
 
@@ -34,6 +36,21 @@ internal class CommitMessage
             Type = new DefaultCommitMessageType();
             Description = messages[0];
         }
+
+        ReleaseDescription = Description;
+
+        if (replaces is not { Count: > 0 })
+        {
+            return;
+        }
+
+        foreach ((string oldValue, string newValue) in replaces)
+        {
+            if (Description.StartsWith(oldValue, StringComparison.InvariantCultureIgnoreCase))
+            {
+                ReleaseDescription = newValue + Description[oldValue.Length..];
+            }
+        }
     }
 
     /// <summary>
@@ -50,6 +67,11 @@ internal class CommitMessage
     /// Obtém a descrição da mensagem de commit.
     /// </summary>
     public string Description { get; }
+
+    /// <summary>
+    /// Obtém a descrição de release da mensagem de commit.
+    /// </summary>
+    public string ReleaseDescription { get; }
 
     /// <summary>
     /// Obtém a representação do tipo da mensagem de commit especificado.
