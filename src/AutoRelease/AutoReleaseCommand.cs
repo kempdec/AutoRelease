@@ -60,6 +60,7 @@ internal class AutoReleaseCommand : RootCommand
         var commitMessages = githubCommits
             .Select(e => new CommitMessage(e.Commit.Message, types))
             .GroupBy(e => e.Type)
+            .OrderBy(e => e.Key.Ordering)
             .ToList();
 
         var builder = new StringBuilder();
