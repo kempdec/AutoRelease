@@ -47,15 +47,38 @@ internal class AutoReleaseCommand : RootCommand
             Credentials = new Credentials(token)
         };
 
-        var githubCommitRequest = new CommitRequest();
+        DateTimeOffset? since = null;
 
-        if (!string.IsNullOrWhiteSpace(branch))
+        try
         {
-            githubCommitRequest.Sha = branch;
+            Release githubLatestRelease = await github.Repository.Release.GetLatest(repo.Owner, repo.Name);
+
+            since = githubLatestRelease.PublishedAt;
+        }
+        catch (NotFoundException)
+        {
         }
 
-        IReadOnlyList<GitHubCommit> githubCommits = await github.Repository.Commit
-            .GetAll(repo.Owner, repo.Name, githubCommitRequest);
+        var githubCommitRequest = new CommitRequest
+        {
+            Sha = branch,
+            Since = since
+        };
+
+        IReadOnlyList<GitHubCommit> githubCommits;
+
+        try
+        {
+            githubCommits = await github.Repository.Commit.GetAll(repo.Owner, repo.Name, githubCommitRequest);
+        }
+        catch (NotFoundException)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("O repositório ou branch não foi encontrado.");
+            Console.ResetColor();
+
+            return;
+        }
 
         var commitMessages = githubCommits
             .Select(e => new CommitMessage(e.Commit.Message, types))
