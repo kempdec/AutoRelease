@@ -12,4 +12,7 @@ internal record FeatCommitMessageType : CommitMessageTypeBase
 
     /// <inheritdoc/>
     public override string Key { get; } = "feat";
+
+    /// <inheritdoc/>
+    public override byte Ordering { get; } = (byte)CommitMessageTypeOrder.Feat;
 }

@@ -12,4 +12,7 @@ internal record DefaultCommitMessageType : CommitMessageTypeBase
 
     /// <inheritdoc/>
     public override string Key { get; } = "commit";
+
+    /// <inheritdoc/>
+    public override byte Ordering { get; } = (byte)CommitMessageTypeOrder.Default;
 }

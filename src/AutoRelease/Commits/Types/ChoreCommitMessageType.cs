@@ -13,4 +13,7 @@ internal record ChoreCommitMessageType : CommitMessageTypeBase
 
     /// <inheritdoc/>
     public override string Key { get; } = "chore";
+
+    /// <inheritdoc/>
+    public override byte Ordering { get; } = (byte)CommitMessageTypeOrder.Chore;
 }

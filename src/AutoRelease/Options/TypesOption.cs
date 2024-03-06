@@ -1,4 +1,4 @@
-﻿using KempDec.AutoRelease.Commits.Types;
+﻿using KempDec.AutoRelease.Commits;
 using KempDec.AutoRelease.Extensions;
 using System.CommandLine;
 using System.CommandLine.Parsing;
@@ -19,8 +19,9 @@ internal class TypesOption : Option<List<CommitMessageType>>
         {
             var types = new List<CommitMessageType>();
 
-            foreach (Token token in result.Tokens)
+            for (byte i = 0; i < result.Tokens.Count; i++)
             {
+                Token token = result.Tokens[i];
                 (string? key, string? label) = token.Value.Split('=');
 
                 if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(label))
@@ -39,7 +40,8 @@ internal class TypesOption : Option<List<CommitMessageType>>
                 types.Add(new CommitMessageType
                 {
                     Key = key,
-                    Label = label
+                    Label = label,
+                    Ordering = i
                 });
             }
 

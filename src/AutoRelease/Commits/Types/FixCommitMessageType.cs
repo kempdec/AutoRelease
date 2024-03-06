@@ -12,4 +12,7 @@ internal record FixCommitMessageType : CommitMessageTypeBase
 
     /// <inheritdoc/>
     public override string Key { get; } = "fix";
+
+    /// <inheritdoc/>
+    public override byte Ordering { get; } = (byte)CommitMessageTypeOrder.Fix;
 }

@@ -23,7 +23,7 @@ internal class CommitMessage
         if (messages.Length >= 2)
         {
             ICommitMessageType? type = types is { Count: > 0 }
-                ? types.SingleOrDefault(e => e.Key == messages[0])
+                ? types.OrderBy(e => e.Ordering).SingleOrDefault(e => e.Key == messages[0])
                 : GetType(messages[0]);
 
             Type = type ?? new DefaultCommitMessageType();
@@ -60,7 +60,7 @@ internal class CommitMessage
     {
         IEnumerable<ICommitMessageType?> types = AssemblyHelper.GetAllClassesWithInterface<ICommitMessageType>();
 
-        return types.SingleOrDefault(e => e?.Key == type);
+        return types.OrderBy(e => e?.Ordering).SingleOrDefault(e => e?.Key == type);
     }
 
     /// <inheritdoc/>

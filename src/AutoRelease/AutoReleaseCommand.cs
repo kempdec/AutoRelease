@@ -1,5 +1,4 @@
 ﻿using KempDec.AutoRelease.Commits;
-using KempDec.AutoRelease.Commits.Types;
 using KempDec.AutoRelease.Options;
 using Octokit;
 using System.CommandLine;

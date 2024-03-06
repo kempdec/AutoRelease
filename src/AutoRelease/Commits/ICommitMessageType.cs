@@ -1,4 +1,4 @@
-﻿namespace KempDec.AutoRelease.Commits.Types;
+﻿namespace KempDec.AutoRelease.Commits;
 
 /// <summary>
 /// Fornece abstração para um tipo de uma mensagem de commit.
@@ -14,4 +14,9 @@ internal interface ICommitMessageType
     /// Obtém o rótulo do tipo de uma mensagem de commit.
     /// </summary>
     public string Label { get; }
+
+    /// <summary>
+    /// Obtém a ordenação do tipo de uma mensagem de commit.
+    /// </summary>
+    public byte Ordering { get; }
 }

@@ -1,4 +1,4 @@
-﻿namespace KempDec.AutoRelease.Commits.Types;
+﻿namespace KempDec.AutoRelease.Commits;
 
 /// <summary>
 /// Fornece abstração para um tipo de uma mensagem de commit.
@@ -10,4 +10,7 @@ internal abstract record CommitMessageTypeBase : ICommitMessageType
 
     /// <inheritdoc/>
     public abstract string Key { get; }
+
+    /// <inheritdoc/>
+    public abstract byte Ordering { get; }
 }
