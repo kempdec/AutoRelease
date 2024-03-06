@@ -15,6 +15,7 @@ internal class AutoReleaseCommand : RootCommand
         description: "Gere releases automaticamente do seu projeto no GitHub usando o Auto Release.")
     {
         AddCommand(new NoteSubCommand());
+        AddCommand(new VersionSubCommand());
     }
 
     /// <summary>
