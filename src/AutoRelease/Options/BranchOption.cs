@@ -11,7 +11,5 @@ internal class BranchOption : Option<string?>
     /// Inicializa uma nova instância de <see cref="BranchOption"/>.
     /// </summary>
     public BranchOption() : base(name: "--branch",
-        description: "O branch do repositório no GitHub.")
-    {
-    }
+        description: "O branch do repositório no GitHub.") => AddAlias("-b");
 }

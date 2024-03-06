@@ -26,5 +26,10 @@ internal class TokenOption : Option<string>
             }
 
             return token;
-        }) => IsRequired = true;
+        })
+    {
+        IsRequired = true;
+
+        AddAlias("-t");
+    }
 }

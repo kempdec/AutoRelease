@@ -41,5 +41,10 @@ internal class RepoOption : Option<(string Owner, string Name)>
             }
 
             return (repoOwner, repoName);
-        }) => IsRequired = true;
+        })
+    {
+        IsRequired = true;
+
+        AddAlias("-r");
+    }
 }
