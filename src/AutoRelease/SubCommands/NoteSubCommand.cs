@@ -98,7 +98,7 @@ internal class NoteSubCommand : Command
                 builder.AppendLine();
             }
 
-            builder.AppendLine($"## {commitMessageGroup.Key.Label}");
+            builder.AppendLine($"# {commitMessageGroup.Key.Label}");
             builder.AppendLine();
 
             foreach (CommitMessage commitMessage in commitMessageGroup.ToList())
