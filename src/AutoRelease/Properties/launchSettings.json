@@ -2,7 +2,7 @@
   "profiles": {
     "AutoRelease": {
       "commandName": "Project",
-      "commandLineArgs": "note\r\n--token %AutoRelease_GitHubToken%\r\n--repo %AutoRelease_Repo%\r\n--branch develop\r\n--types feat=\"Novidades desta versão\" fix=\"Principais correções desta versão\" chore=\"Notas técnicas\"\r\n--replaces \"Adicionar\"=\"Foi adicionado\" \"Adicionar o \"=\"Foi adicionado o \" \"Adicionar a \"=\"Foi adicionada a \" \"Alterar o \"=\"Foi alterado o \" \"Alterar a \"=\"Foi alterada a \" \"Corrigir\"=\"Corrigido um problema em que\""
+      "commandLineArgs": "note\r\n--token %AutoRelease_Token%\r\n--repo %AutoRelease_Repo%\r\n--branch develop\r\n--types feat=\"Novidades desta versão\" fix=\"Principais correções desta versão\" chore=\"Notas técnicas\"\r\n--replaces \"Adicionar\"=\"Foi adicionado\" \"Adicionar o \"=\"Foi adicionado o \" \"Adicionar a \"=\"Foi adicionada a \" \"Alterar o \"=\"Foi alterado o \" \"Alterar a \"=\"Foi alterada a \" \"Corrigir\"=\"Corrigido um problema em que\""
     }
   }
 }

@@ -5,7 +5,7 @@ using System.CommandLine.Parsing;
 namespace KempDec.AutoRelease.Options;
 
 /// <summary>
-/// Representa a opção de substituições do início das mensagens de commit.
+/// Representa a opção das substituições do início das mensagens de commit.
 /// </summary>
 internal class ReplacesOption : Option<List<(string OldValue, string NewValue)>>
 {

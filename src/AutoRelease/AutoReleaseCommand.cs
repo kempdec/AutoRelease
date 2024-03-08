@@ -1,4 +1,5 @@
-﻿using KempDec.AutoRelease.SubCommands;
+﻿using KempDec.AutoRelease.Configurations;
+using KempDec.AutoRelease.SubCommands;
 using System.CommandLine;
 
 namespace KempDec.AutoRelease;
@@ -23,5 +24,10 @@ internal class AutoReleaseCommand : RootCommand
     /// </summary>
     /// <param name="args">Os argumentos a serem analisados.</param>
     /// <returns>A <see cref="Task"/> que representa a operação assíncrona.</returns>
-    public static Task InvokeAsync(string[] args) => new AutoReleaseCommand().InvokeAsync(args);
+    public static Task InvokeAsync(string[] args)
+    {
+        args = AutoReleaseConfig.Instance.SetArgs(args);
+
+        return new AutoReleaseCommand().InvokeAsync(args);
+    }
 }

@@ -11,7 +11,7 @@ internal class TokenOption : Option<string>
     /// <summary>
     /// Inicializa uma nova instância de <see cref="TokenOption"/>.
     /// </summary>
-    public TokenOption(string name = "--token") : base(name,
+    public TokenOption() : base(name: "--token",
         description: "O token para acesso ao repositório no GitHub.",
         isDefault: true,
         parseArgument: result =>

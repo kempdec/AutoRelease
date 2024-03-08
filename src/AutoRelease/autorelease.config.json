@@ -1,0 +1,16 @@
+{
+  // O token para acesso ao repositório no GitHub.
+  "Token": null,
+  // O repositório que contém os commits no GitHub.
+  "Repo": null,
+  // O branch do repositório no GitHub.
+  "Branch": null,
+  // Os tipos das mensagens de commit.
+  "Types": null,
+  // As substituições do início das mensagens de commit.
+  "Replaces": null,
+  // A primeira versão do repositório.
+  "FirstVersion": null,
+  // O prefixo das versões do repositório.
+  "VersionPrefix": null
+}

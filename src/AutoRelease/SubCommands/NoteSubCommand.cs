@@ -45,6 +45,7 @@ internal class NoteSubCommand : Command
         List<CommitMessageType> types, List<(string OldValue, string NewValue)> replaces)
     {
         GitHubClient github = GitHubClientHelper.Create(token);
+
         DateTimeOffset? since = null;
 
         try
@@ -52,6 +53,14 @@ internal class NoteSubCommand : Command
             Release githubLatestRelease = await github.Repository.Release.GetLatest(repo.Owner, repo.Name);
 
             since = githubLatestRelease.PublishedAt;
+        }
+        catch (AuthorizationException)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Não foi possível autorizar. Isso geralmente acontece quando o token é inválido.");
+            Console.ResetColor();
+
+            return;
         }
         catch (NotFoundException)
         {

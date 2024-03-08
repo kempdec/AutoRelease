@@ -69,6 +69,14 @@ internal class VersionSubCommand : Command
 
             since = githubLatestRelease.PublishedAt;
         }
+        catch (AuthorizationException)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Não foi possível autorizar. Isso geralmente acontece quando o token é inválido.");
+            Console.ResetColor();
+
+            return;
+        }
         catch (NotFoundException)
         {
             version = firstVersion;
