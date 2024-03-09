@@ -18,26 +18,20 @@ internal class CommitMessage
     public CommitMessage(string message, List<CommitMessageType>? types = null,
         List<(string OldValue, string NewValue)>? replaces = null)
     {
+        (string? type, string description, string? body) = SplitMessage(message);
+
+        ICommitMessageType? commitType = null;
+
+        if (type is not null)
+        {
+            commitType = types is { Count: > 0 } ? types.SingleOrDefault(e => e.Key == type) : GetType(type);
+        }
+
         OriginMessage = message;
-
-        var messages = message.Split(": ");
-
-        if (messages.Length >= 2)
-        {
-            ICommitMessageType? type = types is { Count: > 0 }
-                ? types.SingleOrDefault(e => e.Key == messages[0])
-                : GetType(messages[0]);
-
-            Type = type ?? new DefaultCommitMessageType();
-            Description = messages[1];
-        }
-        else
-        {
-            Type = new DefaultCommitMessageType();
-            Description = messages[0];
-        }
-
-        ReleaseDescription = Description;
+        Type = commitType ?? new DefaultCommitMessageType();
+        Description = description;
+        Body = body;
+        ReleaseDescription = body ?? Description;
 
         if (replaces is not { Count: > 0 })
         {
@@ -46,9 +40,9 @@ internal class CommitMessage
 
         foreach ((string oldValue, string newValue) in replaces)
         {
-            if (Description.StartsWith(oldValue, StringComparison.InvariantCultureIgnoreCase))
+            if (ReleaseDescription.StartsWith(oldValue, StringComparison.InvariantCultureIgnoreCase))
             {
-                ReleaseDescription = newValue + Description[oldValue.Length..];
+                ReleaseDescription = newValue + ReleaseDescription[oldValue.Length..];
             }
         }
     }
@@ -74,6 +68,11 @@ internal class CommitMessage
     public string ReleaseDescription { get; }
 
     /// <summary>
+    /// Obtém o corpo da mensagem de commit.
+    /// </summary>
+    public string? Body { get; }
+
+    /// <summary>
     /// Obtém a representação do tipo da mensagem de commit especificado.
     /// </summary>
     /// <param name="type">O tipo da mensagem de commit.</param>
@@ -83,6 +82,40 @@ internal class CommitMessage
         IEnumerable<ICommitMessageType?> types = AssemblyHelper.GetAllClassesWithInterface<ICommitMessageType>();
 
         return types.SingleOrDefault(e => e?.Key == type);
+    }
+
+    /// <summary>
+    /// Separa a mensagem de commit especificada em tipo, descrição e corpo.
+    /// </summary>
+    /// <param name="message">A mensagem de commit a ser separada.</param>
+    /// <returns>A mensagem de commit separada em tipo, descrição e corpo.</returns>
+    private static (string? Type, string Description, string? Body) SplitMessage(string message)
+    {
+        var messages = message.Split(": ");
+
+        string description;
+        string? type = null;
+        string? body = null;
+
+        if (messages.Length >= 2)
+        {
+            type = messages[0];
+            description = messages[1];
+        }
+        else
+        {
+            description = messages[0];
+        }
+
+        if (description.Contains("\n\n"))
+        {
+            var descriptions = description.Split("\n\n");
+
+            description = descriptions[0];
+            body = string.Join("\n\n", descriptions[1..]);
+        }
+
+        return (type, description, body);
     }
 
     /// <inheritdoc/>
