@@ -10,7 +10,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageId>AutoRelease</PackageId>
     <Title>Auto Release</Title>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Authors>KempDec</Authors>
     <Company>KempDec Brasil Ltda.</Company>
     <Product>Auto Release</Product>
