@@ -2,6 +2,10 @@
 
 Gere automaticamente releases do seu projeto no GitHub usando o Auto Release.
 
+> **O PROJETO ESTÁ EM DESENVOLVIMENTO E INCOMPLETO, NÃO UTILIZE EM AMBIENTE DE PRODUÇÃO.**
+> 
+> Em breve será adicionada uma documentação completa de como utilizar.
+
 ## Instalação
 
 Instale a ferramenta a partir do SDK do .NET.
