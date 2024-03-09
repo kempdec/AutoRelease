@@ -12,6 +12,9 @@ jobs:
     name: Publicar pacote
     runs-on: ubuntu-latest
     permissions: write-all
+    env:
+      AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }}
+      AutoRelease_Repo: ${{ github.repository }}
 
     steps:
       - name: Checkout do repositório
@@ -29,12 +32,12 @@ jobs:
         id: release_note
         run: |
           echo "NOTE<<EOF" >> "$GITHUB_OUTPUT"
-          autorelease note --token ${{ secrets.GITHUB_TOKEN }} --repo ${{ github.repository }} >> "$GITHUB_OUTPUT"
+          autorelease note >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Criar versão da release
         id: release_version
-        run: echo "VERSION=$(autorelease version --token ${{ secrets.GITHUB_TOKEN }} --repo ${{ github.repository }})" >> "$GITHUB_OUTPUT"
+        run: echo "VERSION=$(autorelease version)" >> "$GITHUB_OUTPUT"
 
       - name: Obter data atual
         id: release_date
