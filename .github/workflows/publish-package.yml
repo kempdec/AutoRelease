@@ -11,6 +11,7 @@ jobs:
   publish:
     name: Publicar pacote
     runs-on: ubuntu-latest
+    permissions: write-all
 
     steps:
       - name: Checkout do repositório
@@ -45,7 +46,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.release_version.outputs.VERSION }}
-          release_name: $Auto Release v${{ steps.release_version.outputs.VERSION }} (${{ steps.release_date.outputs.DATE }})
+          release_name: Auto Release v${{ steps.release_version.outputs.VERSION }} (${{ steps.release_date.outputs.DATE }})
           body: ${{ steps.release_note.outputs.NOTE }}
           draft: false
           prerelease: false
