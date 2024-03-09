@@ -20,18 +20,16 @@ internal class VersionSubCommand : Command
         var token = new TokenOption();
         var repo = new RepoOption();
         var branch = new BranchOption();
-        var types = new TypesOption();
         var firstVersion = new FirstVersionOption();
         var versionPrefix = new VersionPrefixOption();
 
         AddOption(token);
         AddOption(repo);
         AddOption(branch);
-        AddOption(types);
         AddOption(firstVersion);
         AddOption(versionPrefix);
 
-        this.SetHandler(HandleAsync, token, repo, branch, types, firstVersion, versionPrefix);
+        this.SetHandler(HandleAsync, token, repo, branch, firstVersion, versionPrefix);
     }
 
     /// <summary>
@@ -40,13 +38,11 @@ internal class VersionSubCommand : Command
     /// <param name="token">O token para acesso ao repositório no GitHub.</param>
     /// <param name="repo">O repositório que contém os commits no GitHub.</param>
     /// <param name="branch">O branch do repositório no GitHub.</param>
-    /// <param name="types">Os tipos das mensagens de commit.</param>
     /// <param name="firstVersion">A primeira versão do repositório.</param>
     /// <param name="versionPrefix">O prefixo das versões do repositório.</param>
     /// <returns>A <see cref="Task"/> que representa a operação assíncrona.</returns>
     private async Task HandleAsync(string token, (string Owner, string Name) repo, string? branch,
-        List<CommitMessageType> types, SemVersion? firstVersion,
-        string versionPrefix)
+        SemVersion? firstVersion, string versionPrefix)
     {
         GitHubClient github = GitHubClientHelper.Create(token);
         SemVersion? version;
@@ -106,7 +102,7 @@ internal class VersionSubCommand : Command
         }
 
         var commitMessages = githubCommits
-            .Select(e => new CommitMessage(e.Commit.Message, types))
+            .Select(e => new CommitMessage(e.Commit.Message))
             .ToList();
 
         if (commitMessages.Any(e => e.Type.Ordering == (byte)CommitMessageTypeOrder.Feat))

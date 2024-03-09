@@ -26,7 +26,10 @@ internal class AutoReleaseCommand : RootCommand
     /// <returns>A <see cref="Task"/> que representa a operação assíncrona.</returns>
     public static Task InvokeAsync(string[] args)
     {
-        args = AutoReleaseConfig.Instance.SetArgs(args);
+        if (args.Length > 0)
+        {
+            args = AutoReleaseConfig.Instance.SetArgs(args);
+        }
 
         return new AutoReleaseCommand().InvokeAsync(args);
     }

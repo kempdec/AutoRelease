@@ -1,5 +1,6 @@
 ﻿using KempDec.AutoRelease.Configurations.Attributes;
 using KempDec.AutoRelease.Options;
+using KempDec.AutoRelease.SubCommands;
 
 namespace KempDec.AutoRelease.Configurations;
 
@@ -24,26 +25,14 @@ internal partial record AutoReleaseConfig
     public string? Branch { get; init; }
 
     /// <summary>
-    /// Obtém ou inicializa os tipos das mensagens de commit.
+    /// Obtém ou inicializa as configurações do subcomando de geração automática das notas do release.
     /// </summary>
-    [ConfigOption<TypesOption>]
-    public string? Types { get; init; }
+    [ConfigCommand<NoteSubCommand>]
+    public NoteSubCommandConfig? NoteCommand { get; init; }
 
     /// <summary>
-    /// Obtém ou inicializa as substituições do início das mensagens de commit.
+    /// Obtém ou inicializa as configurações do subcomando de geração automática da versão do release.
     /// </summary>
-    [ConfigOption<ReplacesOption>]
-    public string? Replaces { get; init; }
-
-    /// <summary>
-    /// Obtém ou inicializa a primeira versão do repositório.
-    /// </summary>
-    [ConfigOption<FirstVersionOption>]
-    public string? FirstVersion { get; init; }
-
-    /// <summary>
-    /// Obtém ou inicializa o prefixo das versões do repositório.
-    /// </summary>
-    [ConfigOption<VersionPrefixOption>]
-    public string? VersionPrefix { get; init; }
+    [ConfigCommand<VersionSubCommand>]
+    public VersionSubCommandConfig? VersionCommand { get; init; }
 }

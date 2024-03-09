@@ -5,12 +5,32 @@
   "Repo": null,
   // O branch do repositório no GitHub.
   "Branch": null,
-  // Os tipos das mensagens de commit.
-  "Types": null,
-  // As substituições do início das mensagens de commit.
-  "Replaces": null,
-  // A primeira versão do repositório.
-  "FirstVersion": null,
-  // O prefixo das versões do repositório.
-  "VersionPrefix": null
+
+  // As configurações do subcomando de geração automática das notas do release.
+  "NoteCommand": {
+    // Os tipos das mensagens de commit.
+    "Types": [
+      "feat=Novidades desta versão",
+      "fix=Principais correções desta versão",
+      "chore=Notas técnicas"
+    ],
+
+    // As substituições do início das mensagens de commit.
+    "Replaces": {
+      "Adicionar": "Foi adicionado",
+      "Adicionar o ": "Foi adicionado o ",
+      "Adicionar a ": "Foi adicionada a ",
+      "Alterar o ": "Foi alterado o ",
+      "Alterar a ": "Foi alterada a ",
+      "Corrigir": "Corrigido um problema em que"
+    }
+  },
+
+  // As configurações do subcomando de geração automática da versão do release.
+  "VersionCommand": {
+    // A primeira versão do repositório.
+    "FirstVersion": null,
+    // O prefixo das versões do repositório.
+    "VersionPrefix": null
+  }
 }

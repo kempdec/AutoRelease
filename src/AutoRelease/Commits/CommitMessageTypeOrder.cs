@@ -8,9 +8,14 @@ namespace KempDec.AutoRelease.Commits;
 internal enum CommitMessageTypeOrder
 {
     /// <summary>
+    /// <see cref="DefaultCommitMessageType"/>.
+    /// </summary>
+    Default = 255,
+
+    /// <summary>
     /// <see cref="FeatCommitMessageType"/>.
     /// </summary>
-    Feat,
+    Feat = 0,
 
     /// <summary>
     /// <see cref="FixCommitMessageType"/>.
@@ -20,10 +25,5 @@ internal enum CommitMessageTypeOrder
     /// <summary>
     /// <see cref="ChoreCommitMessageType"/>.
     /// </summary>
-    Chore,
-
-    /// <summary>
-    /// <see cref="DefaultCommitMessageType"/>.
-    /// </summary>
-    Default = 255
+    Chore
 }
