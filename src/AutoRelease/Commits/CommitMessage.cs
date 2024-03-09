@@ -107,12 +107,14 @@ internal class CommitMessage
             description = messages[0];
         }
 
-        if (description.Contains("\n\n"))
+        string doubleBreakLine = "\n\n";
+
+        if (description.Contains(doubleBreakLine))
         {
-            var descriptions = description.Split("\n\n");
+            var descriptions = description.Split(doubleBreakLine);
 
             description = descriptions[0];
-            body = string.Join("\n\n", descriptions[1..]);
+            body = string.Join($"{doubleBreakLine}  ", descriptions[1..]);
         }
 
         return (type, description, body);
