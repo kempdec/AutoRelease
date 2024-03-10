@@ -16,4 +16,9 @@ internal interface INoteSubCommandBinder : IGlobalBinder
     /// Obtém ou inicializa a opção das substituições do início das mensagens de commit.
     /// </summary>
     public ReplacesOption ReplacesOption { get; init; }
+
+    /// <summary>
+    /// Obtém ou inicializa a opção dos inícios das mensagens de commit que serão ignoradas.
+    /// </summary>
+    public IgnoresOption IgnoresOption { get; init; }
 }

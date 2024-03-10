@@ -1,4 +1,5 @@
 ﻿using KempDec.AutoRelease.Configurations.Attributes;
+using KempDec.AutoRelease.Configurations.Commands;
 using KempDec.AutoRelease.Options;
 using KempDec.AutoRelease.SubCommands;
 

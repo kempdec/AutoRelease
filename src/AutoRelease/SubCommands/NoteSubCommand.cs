@@ -62,6 +62,7 @@ internal class NoteSubCommand : SubCommandBase<NoteSubCommandBinder, NoteSubComm
 
         var commitMessages = githubCommits
             .Select(e => new CommitMessage(e.Commit.Message, inputs.Types, inputs.Replaces))
+            .Where(e => !inputs.Ignores.Any(e.Description.StartsWith))
             .GroupBy(e => e.Type)
             .OrderBy(e => e.Key.Ordering)
             .ToList();

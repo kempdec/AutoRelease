@@ -28,6 +28,9 @@ internal class CreateSubCommandInputs : GlobalInputs, ICreateSubCommandInputs
     /// <inheritdoc/>
     public List<(string OldValue, string NewValue)> Replaces { get; set; } = null!;
 
+    /// <inheritdoc/>
+    public List<string> Ignores { get; set; } = null!;
+
     #endregion
 
     #region Version.

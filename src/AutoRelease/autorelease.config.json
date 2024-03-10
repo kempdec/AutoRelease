@@ -15,7 +15,19 @@
     // Um sinalizador indicando se o release é um rascunho.
     "Draft": null,
     // Um sinalizador indicando se o release é um pre-release.
-    "PreRelease": null
+    "PreRelease": null,
+
+    // Os tipos das mensagens de commit.
+    "Types": null,
+    // As substituições do início das mensagens de commit.
+    "Replaces": null,
+    // Os inícios das mensagens de commit que serão ignoradas.
+    "Ignores": null,
+
+    // A primeira versão do repositório.
+    "FirstVersion": null,
+    // O prefixo das versões do repositório.
+    "VersionPrefix": null
   },
 
   // As configurações do subcomando de geração automática das notas do release.
@@ -23,7 +35,9 @@
     // Os tipos das mensagens de commit.
     "Types": null,
     // As substituições do início das mensagens de commit.
-    "Replaces": null
+    "Replaces": null,
+    // Os inícios das mensagens de commit que serão ignoradas.
+    "Ignores": null
   },
 
   // As configurações do subcomando de geração automática da versão do release.

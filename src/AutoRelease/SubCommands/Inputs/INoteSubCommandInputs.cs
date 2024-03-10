@@ -16,4 +16,9 @@ internal interface INoteSubCommandInputs : IGlobalInputs
     /// Obtém ou define as substituições do início das mensagens de commit.
     /// </summary>
     public List<(string OldValue, string NewValue)> Replaces { get; set; }
+
+    /// <summary>
+    /// Obtém ou define os inícios das mensagens de commit que serão ignoradas.
+    /// </summary>
+    public List<string> Ignores { get; set; }
 }

@@ -12,4 +12,7 @@ internal class NoteSubCommandInputs : GlobalInputs, INoteSubCommandInputs
 
     /// <inheritdoc/>
     public List<(string OldValue, string NewValue)> Replaces { get; set; } = null!;
+
+    /// <inheritdoc/>
+    public List<string> Ignores { get; set; } = null!;
 }

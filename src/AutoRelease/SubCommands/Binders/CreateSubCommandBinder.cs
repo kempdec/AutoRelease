@@ -30,6 +30,9 @@ internal class CreateSubCommandBinder
     /// <inheritdoc/>
     public ReplacesOption ReplacesOption { get; init; } = new();
 
+    /// <inheritdoc/>
+    public IgnoresOption IgnoresOption { get; init; } = new();
+
     #endregion
 
     #region Version.
@@ -56,6 +59,7 @@ internal class CreateSubCommandBinder
 
         inputs.Types = bindingContext.ParseResult.GetValueForOption(TypesOption)!;
         inputs.Replaces = bindingContext.ParseResult.GetValueForOption(ReplacesOption)!;
+        inputs.Ignores = bindingContext.ParseResult.GetValueForOption(IgnoresOption)!;
 
         #endregion
 

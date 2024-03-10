@@ -1,12 +1,12 @@
 ﻿using KempDec.AutoRelease.Configurations.Attributes;
 using KempDec.AutoRelease.Options;
 
-namespace KempDec.AutoRelease.Configurations;
+namespace KempDec.AutoRelease.Configurations.Commands;
 
 /// <summary>
 /// Associação recursiva das configurações do subcomando de criação automática de um release.
 /// </summary>
-internal class CreateSubCommandConfig
+internal class CreateSubCommandConfig : INoteSubCommandConfig, IVersionSubCommandConfig
 {
     /// <summary>
     /// Obtém ou define a versão do release.
@@ -31,4 +31,32 @@ internal class CreateSubCommandConfig
     /// </summary>
     [ConfigOption<PreReleaseOption>]
     public bool? PreRelease { get; set; }
+
+    #region Note.
+
+    /// <inheritdoc/>
+    [ConfigOption<TypesOption>]
+    public List<string>? Types { get; init; }
+
+    /// <inheritdoc/>
+    [ConfigOption<ReplacesOption>]
+    public Dictionary<string, string>? Replaces { get; init; }
+
+    /// <inheritdoc/>
+    [ConfigOption<IgnoresOption>]
+    public List<string>? Ignores { get; set; }
+
+    #endregion
+
+    #region Version.
+
+    /// <inheritdoc/>
+    [ConfigOption<FirstVersionOption>]
+    public string? FirstVersion { get; init; }
+
+    /// <inheritdoc/>
+    [ConfigOption<VersionPrefixOption>]
+    public string? VersionPrefix { get; init; }
+
+    #endregion
 }
