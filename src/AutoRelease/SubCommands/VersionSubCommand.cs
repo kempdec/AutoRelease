@@ -82,7 +82,7 @@ internal class VersionSubCommand
 
         if (commitMessages.Any(e => e.Type.Ordering == (byte)CommitMessageTypeOrder.Feat))
         {
-            version = version.WithMinor(version.Minor + 1);
+            version = version.With(version.Major, version.Minor + 1, patch: 0);
         }
         else
         {
