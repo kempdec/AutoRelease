@@ -21,4 +21,10 @@ internal interface INoteSubCommandBinder : IGlobalBinder
     /// Obtém ou inicializa a opção dos inícios das mensagens de commit que serão ignoradas.
     /// </summary>
     public IgnoresOption IgnoresOption { get; init; }
+
+    /// <summary>
+    /// Obtém ou inicializa a opção de um sinalizador indicando se o autor deve ser exibido no final das mensagens de
+    /// commit.
+    /// </summary>
+    public ShowAuthorOption ShowAuthorOption { get; init; }
 }

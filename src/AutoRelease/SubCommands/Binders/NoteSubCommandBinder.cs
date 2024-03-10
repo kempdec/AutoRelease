@@ -20,6 +20,9 @@ internal class NoteSubCommandBinder
     public IgnoresOption IgnoresOption { get; init; } = new();
 
     /// <inheritdoc/>
+    public ShowAuthorOption ShowAuthorOption { get; init; } = new();
+
+    /// <inheritdoc/>
     protected override NoteSubCommandInputs GetBoundValue(BindingContext bindingContext)
     {
         NoteSubCommandInputs inputs = base.GetBoundValue(bindingContext);
@@ -27,6 +30,7 @@ internal class NoteSubCommandBinder
         inputs.Types = bindingContext.ParseResult.GetValueForOption(TypesOption)!;
         inputs.Replaces = bindingContext.ParseResult.GetValueForOption(ReplacesOption)!;
         inputs.Ignores = bindingContext.ParseResult.GetValueForOption(IgnoresOption)!;
+        inputs.ShowAuthor = bindingContext.ParseResult.GetValueForOption(ShowAuthorOption);
 
         return inputs;
     }

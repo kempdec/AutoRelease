@@ -53,6 +53,10 @@ internal class CreateSubCommandConfig : INoteSubCommandConfig, IVersionSubComman
     [ConfigOption<IgnoresOption>]
     public List<string>? Ignores { get; set; }
 
+    /// <inheritdoc/>
+    [ConfigOption<ShowAuthorOption>]
+    public bool? ShowAuthor { get; set; }
+
     #endregion
 
     #region Version.

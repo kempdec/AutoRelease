@@ -15,4 +15,7 @@ internal class NoteSubCommandInputs : GlobalInputs, INoteSubCommandInputs
 
     /// <inheritdoc/>
     public List<string> Ignores { get; set; } = null!;
+
+    /// <inheritdoc/>
+    public bool ShowAuthor { get; set; }
 }

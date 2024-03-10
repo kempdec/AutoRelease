@@ -25,6 +25,8 @@
     "Replaces": null,
     // Os inícios das mensagens de commit que serão ignoradas.
     "Ignores": null,
+    // Um sinalizador indicando se o autor deve ser exibido no final das mensagens de commit.
+    "ShowAuthor": null,
 
     // A primeira versão do repositório.
     "FirstVersion": null,
@@ -39,7 +41,9 @@
     // As substituições do início das mensagens de commit.
     "Replaces": null,
     // Os inícios das mensagens de commit que serão ignoradas.
-    "Ignores": null
+    "Ignores": null,
+    // Um sinalizador indicando se o autor deve ser exibido no final das mensagens de commit.
+    "ShowAuthor": null
   },
 
   // As configurações do subcomando de geração automática da versão do release.

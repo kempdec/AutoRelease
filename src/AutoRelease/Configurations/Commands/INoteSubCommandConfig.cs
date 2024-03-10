@@ -20,4 +20,9 @@ internal interface INoteSubCommandConfig
     /// Obtém ou define os inícios das mensagens de commit que serão ignoradas.
     /// </summary>
     public List<string>? Ignores { get; set; }
+
+    /// <summary>
+    /// Obtém ou define um sinalizador indicando se o autor deve ser exibido no final das mensagens de commit.
+    /// </summary>
+    public bool? ShowAuthor { get; set; }
 }

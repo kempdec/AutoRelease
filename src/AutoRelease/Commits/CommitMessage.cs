@@ -1,5 +1,8 @@
 ﻿using KempDec.AutoRelease.Commits.Types;
+using KempDec.AutoRelease.SubCommands;
+using KempDec.AutoRelease.SubCommands.Inputs;
 using KempDec.StarterDotNet.Reflection;
+using Octokit;
 
 namespace KempDec.AutoRelease.Commits;
 
@@ -11,12 +14,22 @@ internal class CommitMessage
     /// <summary>
     /// Inicializa uma nova instância de <see cref="CommitMessage"/>.
     /// </summary>
-    /// <param name="message">A mensagem de commit. É ideal que a mensagem de commit esteja estruturada da seguinte
-    /// forma: &lt;tipo&gt;: &lt;descrição&gt;.</param>
+    /// <param name="commit">O commit.</param>
+    /// <param name="inputs">As entradas do subcomando <see cref="NoteSubCommand"/>.</param>
+    public CommitMessage(Commit commit, INoteSubCommandInputs inputs)
+        : this(commit.Message, inputs.Types, inputs.Replaces, inputs.ShowAuthor ? commit.Author.Name : null)
+    {
+    }
+
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="CommitMessage"/>.
+    /// </summary>
+    /// <param name="message">A mensagem de commit.</param>
     /// <param name="types">Os tipos de mensagem de commit.</param>
     /// <param name="replaces">As substituições do início das mensagens de commit.</param>
+    /// <param name="authorName">O nome do autor da mensagem de commit.</param>
     public CommitMessage(string message, List<CommitMessageType>? types = null,
-        List<(string OldValue, string NewValue)>? replaces = null)
+        List<(string OldValue, string NewValue)>? replaces = null, string? authorName = null)
     {
         (string? type, string description, string? body) = SplitMessage(message);
 
@@ -42,11 +55,16 @@ internal class CommitMessage
         }
 
         OriginMessage = message;
+        IsBreakingChange = IsBreakingChange || body?.Contains("BREAKING CHANGE:") is true;
         Type = commitType ?? new DefaultCommitMessageType();
         Description = description;
         Body = body;
         ReleaseDescription = body ?? Description;
-        IsBreakingChange = IsBreakingChange || body?.Contains("BREAKING CHANGE:") is true;
+
+        if (!string.IsNullOrWhiteSpace(authorName))
+        {
+            ReleaseDescription += $" [{authorName}]";
+        }
 
         if (replaces is not { Count: > 0 })
         {

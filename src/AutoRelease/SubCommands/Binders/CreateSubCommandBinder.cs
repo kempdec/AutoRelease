@@ -36,6 +36,9 @@ internal class CreateSubCommandBinder
     /// <inheritdoc/>
     public IgnoresOption IgnoresOption { get; init; } = new();
 
+    /// <inheritdoc/>
+    public ShowAuthorOption ShowAuthorOption { get; init; } = new();
+
     #endregion
 
     #region Version.
@@ -64,6 +67,7 @@ internal class CreateSubCommandBinder
         inputs.Types = bindingContext.ParseResult.GetValueForOption(TypesOption)!;
         inputs.Replaces = bindingContext.ParseResult.GetValueForOption(ReplacesOption)!;
         inputs.Ignores = bindingContext.ParseResult.GetValueForOption(IgnoresOption)!;
+        inputs.ShowAuthor = bindingContext.ParseResult.GetValueForOption(ShowAuthorOption);
 
         #endregion
 

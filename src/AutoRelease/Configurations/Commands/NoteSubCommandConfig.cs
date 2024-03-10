@@ -19,4 +19,8 @@ internal record NoteSubCommandConfig : INoteSubCommandConfig
     /// <inheritdoc/>
     [ConfigOption<IgnoresOption>]
     public List<string>? Ignores { get; set; }
+
+    /// <inheritdoc/>
+    [ConfigOption<ShowAuthorOption>]
+    public bool? ShowAuthor { get; set; }
 }
