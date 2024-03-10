@@ -6,42 +6,35 @@ using System.CommandLine.Parsing;
 namespace KempDec.AutoRelease.Options;
 
 /// <summary>
-/// Representa a opção da primeira versão do repositório.
+/// Representa a opção da versão do release.
 /// </summary>
-internal class FirstVersionOption : Option<SemVersion>
+internal class VersionOption : Option<SemVersion?>
 {
     /// <summary>
-    /// Inicializa uma nova instância de <see cref="FirstVersionOption"/>.
+    /// Inicializa uma nova instância de <see cref="VersionOption"/>.
     /// </summary>
-    public FirstVersionOption() : base(
-        name: "--first-version",
-        description: "A primeira versão do repositório.",
-        parseArgument: ParseArgument)
-    {
-    }
-
-    /// <summary>
-    /// Obtém a primeira versão padrão.
-    /// </summary>
-    public static SemVersion Default { get; } = new(major: 1, minor: 0, patch: 0);
+    public VersionOption() : base(
+        name: "--version",
+        description: "A versão do release.",
+        parseArgument: ParseArgument) => AddAlias("-v");
 
     /// <summary>
     /// Analisa o resultado do argumento especificado para o tipo esperado da opção.
     /// </summary>
     /// <param name="result">O resultado do argumento da opção.</param>
     /// <returns>O tipo esperado da opção.</returns>
-    private static SemVersion ParseArgument(ArgumentResult result)
+    private static SemVersion? ParseArgument(ArgumentResult result)
     {
         string? version = result.GetSingleTokenOrDefault();
 
         if (string.IsNullOrWhiteSpace(version))
         {
-            return Default;
+            return null;
         }
 
         if (!SemVersion.TryParse(version, SemVersionStyles.Strict, out SemVersion semVersion))
         {
-            result.ErrorMessage = "A primeira versão não é uma versão semântica 2.0 válida.";
+            result.ErrorMessage = "A versão não é uma versão semântica 2.0 válida.";
 
             return default!;
         }

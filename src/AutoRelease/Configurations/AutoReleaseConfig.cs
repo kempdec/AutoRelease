@@ -1,6 +1,5 @@
 ﻿using KempDec.AutoRelease.Configurations.Attributes;
 using Microsoft.Extensions.Configuration;
-using System.Collections;
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;

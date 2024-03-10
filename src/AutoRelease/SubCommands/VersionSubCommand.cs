@@ -1,59 +1,41 @@
 ﻿using KempDec.AutoRelease.Commits;
 using KempDec.AutoRelease.Helper;
 using KempDec.AutoRelease.Options;
+using KempDec.AutoRelease.SubCommands.Binders;
+using KempDec.AutoRelease.SubCommands.Inputs;
+using KempDec.AutoRelease.SubCommands.Results;
 using Octokit;
 using Semver;
-using System.CommandLine;
 
 namespace KempDec.AutoRelease.SubCommands;
 
 /// <summary>
 /// Responsável pelo gerenciamento do subcomando de geração automática da versão do release.
 /// </summary>
-internal class VersionSubCommand : Command
+internal class VersionSubCommand
+    : SubCommandBase<VersionSubCommandBinder, VersionSubCommandInputs, IVersionSubCommandInputs>
 {
     /// <summary>
     /// Inicializa uma nova instância de <see cref="VersionSubCommand"/>.
     /// </summary>
-    public VersionSubCommand() : base(name: "version", description: "Gere a versão do release.")
+    public VersionSubCommand() : base(name: "version", description: "Gera a versão do release.")
     {
-        var token = new TokenOption();
-        var repo = new RepoOption();
-        var branch = new BranchOption();
-        var firstVersion = new FirstVersionOption();
-        var versionPrefix = new VersionPrefixOption();
-
-        AddOption(token);
-        AddOption(repo);
-        AddOption(branch);
-        AddOption(firstVersion);
-        AddOption(versionPrefix);
-
-        this.SetHandler(HandleAsync, token, repo, branch, firstVersion, versionPrefix);
     }
 
-    /// <summary>
-    /// Manipula o comando.
-    /// </summary>
-    /// <param name="token">O token para acesso ao repositório no GitHub.</param>
-    /// <param name="repo">O repositório que contém os commits no GitHub.</param>
-    /// <param name="branch">O branch do repositório no GitHub.</param>
-    /// <param name="firstVersion">A primeira versão do repositório.</param>
-    /// <param name="versionPrefix">O prefixo das versões do repositório.</param>
-    /// <returns>A <see cref="Task"/> que representa a operação assíncrona.</returns>
-    private async Task HandleAsync(string token, (string Owner, string Name) repo, string? branch,
-        SemVersion? firstVersion, string versionPrefix)
+    /// <inheritdoc/>
+    public override async Task<SubCommandResult> HandleResultAsync(IVersionSubCommandInputs inputs)
     {
-        GitHubClient github = GitHubClientHelper.Create(token);
+        GitHubClient github = GitHubClientHelper.Create(inputs.Token);
         SemVersion? version;
         DateTimeOffset? since = null;
 
         try
         {
-            Release githubLatestRelease = await github.Repository.Release.GetLatest(repo.Owner, repo.Name);
+            Release githubLatestRelease = await github.Repository.Release.GetLatest(inputs.Repo.Owner,
+                inputs.Repo.Name);
 
-            string tagVersion = githubLatestRelease.TagName.StartsWith(versionPrefix)
-                ? githubLatestRelease.TagName[versionPrefix.Length..]
+            string tagVersion = githubLatestRelease.TagName.StartsWith(inputs.VersionPrefix)
+                ? githubLatestRelease.TagName[inputs.VersionPrefix.Length..]
                 : githubLatestRelease.TagName;
 
             if (!SemVersion.TryParse(tagVersion, SemVersionStyles.Strict, out version))
@@ -67,22 +49,18 @@ internal class VersionSubCommand : Command
         }
         catch (AuthorizationException)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Não foi possível autorizar. Isso geralmente acontece quando o token é inválido.");
-            Console.ResetColor();
-
-            return;
+            return Error("Não foi possível autorizar. Isso geralmente acontece quando o token é inválido.");
         }
         catch (NotFoundException)
         {
-            version = firstVersion;
+            version = inputs.FirstVersion;
         }
 
         version ??= FirstVersionOption.Default;
 
         var githubCommitRequest = new CommitRequest
         {
-            Sha = branch,
+            Sha = inputs.Branch,
             Since = since
         };
 
@@ -90,15 +68,12 @@ internal class VersionSubCommand : Command
 
         try
         {
-            githubCommits = await github.Repository.Commit.GetAll(repo.Owner, repo.Name, githubCommitRequest);
+            githubCommits = await github.Repository.Commit.GetAll(inputs.Repo.Owner, inputs.Repo.Name,
+                githubCommitRequest);
         }
         catch (NotFoundException)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("O repositório ou branch não foi encontrado.");
-            Console.ResetColor();
-
-            return;
+            return Error("O repositório ou branch não foi encontrado.");
         }
 
         var commitMessages = githubCommits
@@ -114,6 +89,6 @@ internal class VersionSubCommand : Command
             version = version.WithPatch(version.Patch + 1);
         }
 
-        await Console.Out.WriteLineAsync(version.ToString());
+        return Succeeded(value: version.ToString());
     }
 }

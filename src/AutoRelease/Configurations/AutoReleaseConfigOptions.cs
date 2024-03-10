@@ -25,6 +25,12 @@ internal partial record AutoReleaseConfig
     public string? Branch { get; init; }
 
     /// <summary>
+    /// Obtém ou inicializa as configurações do subcomando de criação automática de um release.
+    /// </summary>
+    [ConfigCommand<CreateSubCommand>]
+    public CreateSubCommandConfig? CreateCommand { get; init; }
+
+    /// <summary>
     /// Obtém ou inicializa as configurações do subcomando de geração automática das notas do release.
     /// </summary>
     [ConfigCommand<NoteSubCommand>]

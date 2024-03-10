@@ -6,6 +6,18 @@
   // O branch do repositório no GitHub.
   "Branch": null,
 
+  // As configurações do subcomando de criação automática de um release.
+  "CreateCommand": {
+    // A versão do release.
+    "Version": null,
+    // O nome do projeto.
+    "ProjectName": null,
+    // Um sinalizador indicando se o release é um rascunho.
+    "Draft": null,
+    // Um sinalizador indicando se o release é um pre-release.
+    "PreRelease": null
+  },
+
   // As configurações do subcomando de geração automática das notas do release.
   "NoteCommand": {
     // Os tipos das mensagens de commit.

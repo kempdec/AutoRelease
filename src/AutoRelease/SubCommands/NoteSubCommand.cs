@@ -1,8 +1,9 @@
 ﻿using KempDec.AutoRelease.Commits;
 using KempDec.AutoRelease.Helper;
-using KempDec.AutoRelease.Options;
+using KempDec.AutoRelease.SubCommands.Binders;
+using KempDec.AutoRelease.SubCommands.Inputs;
+using KempDec.AutoRelease.SubCommands.Results;
 using Octokit;
-using System.CommandLine;
 using System.Text;
 
 namespace KempDec.AutoRelease.SubCommands;
@@ -10,57 +11,32 @@ namespace KempDec.AutoRelease.SubCommands;
 /// <summary>
 /// Responsável pelo gerenciamento do subcomando de geração automática das notas do release.
 /// </summary>
-internal class NoteSubCommand : Command
+internal class NoteSubCommand : SubCommandBase<NoteSubCommandBinder, NoteSubCommandInputs, INoteSubCommandInputs>
 {
     /// <summary>
     /// Inicializa uma nova instância de <see cref="NoteSubCommand"/>.
     /// </summary>
     public NoteSubCommand() : base(name: "note", description: "Gera as notas do release.")
     {
-        var token = new TokenOption();
-        var repo = new RepoOption();
-        var branch = new BranchOption();
-        var types = new TypesOption();
-        var replaces = new ReplacesOption();
-
-        AddOption(token);
-        AddOption(repo);
-        AddOption(branch);
-        AddOption(types);
-        AddOption(replaces);
-
-        this.SetHandler(HandleAsync, token, repo, branch, types, replaces);
     }
 
-    /// <summary>
-    /// Manipula o comando.
-    /// </summary>
-    /// <param name="token">O token para acesso ao repositório no GitHub.</param>
-    /// <param name="repo">O repositório que contém os commits no GitHub.</param>
-    /// <param name="branch">O branch do repositório no GitHub.</param>
-    /// <param name="types">Os tipos das mensagens de commit.</param>
-    /// <param name="replaces">As substituições do início das mensagens de commit.</param>
-    /// <returns>A <see cref="Task"/> que representa a operação assíncrona.</returns>
-    private async Task HandleAsync(string token, (string Owner, string Name) repo, string? branch,
-        List<CommitMessageType> types, List<(string OldValue, string NewValue)> replaces)
+    /// <inheritdoc/>
+    public override async Task<SubCommandResult> HandleResultAsync(INoteSubCommandInputs inputs)
     {
-        GitHubClient github = GitHubClientHelper.Create(token);
+        GitHubClient github = GitHubClientHelper.Create(inputs.Token);
 
         DateTimeOffset? since = null;
 
         try
         {
-            Release githubLatestRelease = await github.Repository.Release.GetLatest(repo.Owner, repo.Name);
+            Release githubLatestRelease = await github.Repository.Release.GetLatest(inputs.Repo.Owner,
+                inputs.Repo.Name);
 
             since = githubLatestRelease.PublishedAt;
         }
         catch (AuthorizationException)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Não foi possível autorizar. Isso geralmente acontece quando o token é inválido.");
-            Console.ResetColor();
-
-            return;
+            return Error("Não foi possível autorizar. Isso geralmente acontece quando o token é inválido.");
         }
         catch (NotFoundException)
         {
@@ -68,7 +44,7 @@ internal class NoteSubCommand : Command
 
         var githubCommitRequest = new CommitRequest
         {
-            Sha = branch,
+            Sha = inputs.Branch,
             Since = since
         };
 
@@ -76,19 +52,16 @@ internal class NoteSubCommand : Command
 
         try
         {
-            githubCommits = await github.Repository.Commit.GetAll(repo.Owner, repo.Name, githubCommitRequest);
+            githubCommits = await github.Repository.Commit.GetAll(inputs.Repo.Owner, inputs.Repo.Name,
+                githubCommitRequest);
         }
         catch (NotFoundException)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("O repositório ou branch não foi encontrado.");
-            Console.ResetColor();
-
-            return;
+            return Error("O repositório ou branch não foi encontrado.");
         }
 
         var commitMessages = githubCommits
-            .Select(e => new CommitMessage(e.Commit.Message, types, replaces))
+            .Select(e => new CommitMessage(e.Commit.Message, inputs.Types, inputs.Replaces))
             .GroupBy(e => e.Type)
             .OrderBy(e => e.Key.Ordering)
             .ToList();
@@ -116,6 +89,6 @@ internal class NoteSubCommand : Command
             }
         }
 
-        await Console.Out.WriteLineAsync(builder);
+        return Succeeded(value: builder.ToString());
     }
 }
