@@ -46,6 +46,7 @@ internal class CommitMessage
         Description = description;
         Body = body;
         ReleaseDescription = body ?? Description;
+        IsBreakingChange = IsBreakingChange || body?.Contains("BREAKING CHANGE:") is true;
 
         if (replaces is not { Count: > 0 })
         {
