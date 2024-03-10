@@ -26,7 +26,7 @@ internal class VersionSubCommand
     public override async Task<SubCommandResult> HandleResultAsync(IVersionSubCommandInputs inputs)
     {
         GitHubClient github = GitHubClientHelper.Create(inputs.Token);
-        SemVersion? version;
+        SemVersion? version = null;
         DateTimeOffset? since = null;
 
         try
@@ -53,10 +53,7 @@ internal class VersionSubCommand
         }
         catch (NotFoundException)
         {
-            version = inputs.FirstVersion;
         }
-
-        version ??= FirstVersionOption.Default;
 
         var githubCommitRequest = new CommitRequest
         {
@@ -80,7 +77,11 @@ internal class VersionSubCommand
             .Select(e => new CommitMessage(e.Commit.Message))
             .ToList();
 
-        if (commitMessages.Any(e => e.IsBreakingChange))
+        if (version is null)
+        {
+            version = inputs.FirstVersion ?? FirstVersionOption.Default;
+        }
+        else if (commitMessages.Any(e => e.IsBreakingChange))
         {
             version = version.With(version.Major + 1, minor: 0, patch: 0);
         }
