@@ -1,6 +1,8 @@
 {
   // As configurações do subcomando de criação automática de um release.
   "CreateCommand": {
+    // O nome do projeto.
+    "ProjectName": "Auto Release",
     // O tipo de saída da criação automática do release.
     "OutputType": "version",
 
