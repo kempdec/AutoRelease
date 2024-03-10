@@ -1,4 +1,5 @@
-﻿using Semver;
+﻿using KempDec.AutoRelease.SubCommands.Models;
+using Semver;
 
 namespace KempDec.AutoRelease.SubCommands.Inputs;
 
@@ -26,4 +27,9 @@ internal interface ICreateSubCommandInputs : INoteSubCommandInputs, IVersionSubC
     /// Obtém ou define um sinalizador indicando se o release é um pre-release.
     /// </summary>
     public bool PreRelease { get; set; }
+
+    /// <summary>
+    /// Obtém ou define o tipo de saída da criação automática do release.
+    /// </summary>
+    public CreateOutputType OutputType { get; set; }
 }

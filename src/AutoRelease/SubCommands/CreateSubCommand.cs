@@ -1,6 +1,7 @@
 ﻿using KempDec.AutoRelease.Helper;
 using KempDec.AutoRelease.SubCommands.Binders;
 using KempDec.AutoRelease.SubCommands.Inputs;
+using KempDec.AutoRelease.SubCommands.Models;
 using KempDec.AutoRelease.SubCommands.Results;
 using Octokit;
 
@@ -50,6 +51,14 @@ internal class CreateSubCommand
 
         Release releaseResult = await github.Repository.Release.Create(inputs.Repo.Owner, inputs.Repo.Name, release);
 
-        return Succeeded(releaseResult.Id.ToString());
+        string output = inputs.OutputType switch
+        {
+            CreateOutputType.Id => releaseResult.Id.ToString(),
+            CreateOutputType.UploadUrl => releaseResult.UploadUrl.ToString(),
+            CreateOutputType.Version => version,
+            _ => throw new IndexOutOfRangeException("O tipo de saída está fora do intervalo.")
+        };
+
+        return Succeeded(output);
     }
 }

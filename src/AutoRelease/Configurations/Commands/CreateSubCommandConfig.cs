@@ -1,5 +1,6 @@
 ﻿using KempDec.AutoRelease.Configurations.Attributes;
 using KempDec.AutoRelease.Options;
+using KempDec.AutoRelease.SubCommands.Models;
 
 namespace KempDec.AutoRelease.Configurations.Commands;
 
@@ -31,6 +32,12 @@ internal class CreateSubCommandConfig : INoteSubCommandConfig, IVersionSubComman
     /// </summary>
     [ConfigOption<PreReleaseOption>]
     public bool? PreRelease { get; set; }
+
+    /// <summary>
+    /// Obtém ou define o tipo de saída da criação automática do release.
+    /// </summary>
+    [ConfigOption<CreateOutputTypeOption>]
+    public CreateOutputType? OutputType { get; set; }
 
     #region Note.
 

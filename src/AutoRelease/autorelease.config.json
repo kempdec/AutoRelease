@@ -16,6 +16,8 @@
     "Draft": null,
     // Um sinalizador indicando se o release é um pre-release.
     "PreRelease": null,
+    // O tipo de saída da criação automática do release.
+    "OutputType": null,
 
     // Os tipos das mensagens de commit.
     "Types": null,

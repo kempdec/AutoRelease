@@ -22,6 +22,9 @@ internal class CreateSubCommandBinder
     /// <inheritdoc/>
     public PreReleaseOption PreReleaseOption { get; init; } = new();
 
+    /// <inheritdoc/>
+    public CreateOutputTypeOption OutputTypeOption { get; init; } = new();
+
     #region Notes.
 
     /// <inheritdoc/>
@@ -54,6 +57,7 @@ internal class CreateSubCommandBinder
         inputs.ProjectName = bindingContext.ParseResult.GetValueForOption(ProjectNameOption);
         inputs.Draft = bindingContext.ParseResult.GetValueForOption(DraftOption);
         inputs.PreRelease = bindingContext.ParseResult.GetValueForOption(PreReleaseOption);
+        inputs.OutputType = bindingContext.ParseResult.GetValueForOption(OutputTypeOption);
 
         #region Notes.
 

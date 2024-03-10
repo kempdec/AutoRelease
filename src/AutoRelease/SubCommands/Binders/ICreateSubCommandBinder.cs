@@ -26,4 +26,9 @@ internal interface ICreateSubCommandBinder : INoteSubCommandBinder, IVersionSubC
     /// Obtém ou inicializa a opção de um sinalizador indicando se o release é um pre-release.
     /// </summary>
     public PreReleaseOption PreReleaseOption { get; init; }
+
+    /// <summary>
+    /// Obtém ou inicializa a opção do tipo de saída da criação automática do release.
+    /// </summary>
+    public CreateOutputTypeOption OutputTypeOption { get; init; }
 }

@@ -1,4 +1,5 @@
 ﻿using KempDec.AutoRelease.Commits;
+using KempDec.AutoRelease.SubCommands.Models;
 using Semver;
 
 namespace KempDec.AutoRelease.SubCommands.Inputs;
@@ -19,6 +20,9 @@ internal class CreateSubCommandInputs : GlobalInputs, ICreateSubCommandInputs
 
     /// <inheritdoc/>
     public bool PreRelease { get; set; }
+
+    /// <inheritdoc/>
+    public CreateOutputType OutputType { get; set; }
 
     #region Notes.
 
