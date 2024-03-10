@@ -20,7 +20,21 @@ internal class CommitMessage
     {
         (string? type, string description, string? body) = SplitMessage(message);
 
-        ICommitMessageType? commitType = type?.Last() is '#' ? new IgnoreCommitMessageType() : null;
+        ICommitMessageType? commitType = null;
+
+        if (type is not null)
+        {
+            switch (type.Last())
+            {
+                case '#':
+                    commitType = new IgnoreCommitMessageType();
+                    break;
+
+                case '!':
+                    IsBreakingChange = true;
+                    break;
+            }
+        }
 
         if (commitType is null && type is not null)
         {
@@ -71,6 +85,11 @@ internal class CommitMessage
     /// Obtém o corpo da mensagem de commit.
     /// </summary>
     public string? Body { get; }
+
+    /// <summary>
+    /// Obtém um sinalizador indicando se a mensagem de commit é traz uma quebra de compatibilidade.
+    /// </summary>
+    public bool IsBreakingChange { get; }
 
     /// <summary>
     /// Obtém a representação do tipo da mensagem de commit especificado.

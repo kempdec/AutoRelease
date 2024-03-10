@@ -80,7 +80,11 @@ internal class VersionSubCommand
             .Select(e => new CommitMessage(e.Commit.Message))
             .ToList();
 
-        if (commitMessages.Any(e => e.Type.Ordering == (byte)CommitMessageTypeOrder.Feat))
+        if (commitMessages.Any(e => e.IsBreakingChange))
+        {
+            version = version.With(version.Major + 1, minor: 0, patch: 0);
+        }
+        else if (commitMessages.Any(e => e.Type.Ordering == (byte)CommitMessageTypeOrder.Feat))
         {
             version = version.With(version.Major, version.Minor + 1, patch: 0);
         }
