@@ -1,6 +1,9 @@
 {
-  // As configurações do subcomando de geração automática das notas do release.
-  "NoteCommand": {
+  // As configurações do subcomando de criação automática de um release.
+  "CreateCommand": {
+    // O tipo de saída da criação automática do release.
+    "OutputType": "version",
+
     // Os tipos das mensagens de commit.
     "Types": [
       "feat=Novidades desta versão",
@@ -10,17 +13,40 @@
 
     // As substituições do início das mensagens de commit.
     "Replaces": {
+      // Adicionar.
       "Adicionar": "Foi adicionado",
       "Adicionar o ": "Foi adicionado o ",
       "Adicionar a ": "Foi adicionada a ",
+
+      // Alterar.
+      "Alterar": "Foi alterado",
       "Alterar o ": "Foi alterado o ",
       "Alterar a ": "Foi alterada a ",
-      "Corrigir": "Corrigido um problema em que"
-    }
-  },
 
-  // As configurações do subcomando de geração automática da versão do release.
-  "VersionCommand": {
+      // Atualizar.
+      "Atualizar": "Foi atualizado",
+      "Atualizar o ": "Foi atualizado o ",
+      "Atualizar a ": "Foi atualizada a ",
+
+      // Remover.
+      "Remover": "Foi removido",
+      "Remover o ": "Foi removido o ",
+      "Remover a ": "Foi removida a ",
+
+      // Refatorar.
+      "Refatorar": "Foi refatorado",
+      "Refatorar o ": "Foi refatorado o ",
+      "Refatorar a ": "Foi refatorada a ",
+
+      // Corrigir.
+      "Corrigir": "Corrigido um problema em que"
+    },
+
+    // Os inícios das mensagens de commit que serão ignoradas.
+    "Ignores": [
+      "Refatorar."
+    ],
+
     // A primeira versão do repositório.
     "FirstVersion": "0.1.0"
   }
