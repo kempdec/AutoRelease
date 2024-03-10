@@ -63,9 +63,9 @@ jobs:
       - name: Carregar o pacote no NuGet
         run: |
           cd published/
-          dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+          dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --version ${{ steps.release_version.outputs.VERSION }} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
 
       - name: Carregar o pacote no GitHub
         run: |
           cd published/
-          dotnet nuget push *.nupkg --api-key ${{ secrets.PACKAGE_TOKEN }} --source "https://nuget.pkg.github.com/kempdec/index.json" --skip-duplicate
+          dotnet nuget push *.nupkg --api-key ${{ secrets.PACKAGE_TOKEN }} --version ${{ steps.release_version.outputs.VERSION }} --source "https://nuget.pkg.github.com/kempdec/index.json" --skip-duplicate
