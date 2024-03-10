@@ -95,5 +95,14 @@ namespace KempDec.AutoRelease.Resources {
                 return ResourceManager.GetString("Fix", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Ignorados.
+        /// </summary>
+        internal static string Ignore {
+            get {
+                return ResourceManager.GetString("Ignore", resourceCulture);
+            }
+        }
     }
 }

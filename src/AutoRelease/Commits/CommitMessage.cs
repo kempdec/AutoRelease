@@ -20,9 +20,9 @@ internal class CommitMessage
     {
         (string? type, string description, string? body) = SplitMessage(message);
 
-        ICommitMessageType? commitType = null;
+        ICommitMessageType? commitType = type?.Last() is '#' ? new IgnoreCommitMessageType() : null;
 
-        if (type is not null)
+        if (commitType is null && type is not null)
         {
             commitType = types is { Count: > 0 } ? types.SingleOrDefault(e => e.Key == type) : GetType(type);
         }

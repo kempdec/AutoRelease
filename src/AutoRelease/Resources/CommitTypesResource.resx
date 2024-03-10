@@ -129,4 +129,7 @@
   <data name="Fix" xml:space="preserve">
     <value>Correções</value>
   </data>
+  <data name="Ignore" xml:space="preserve">
+    <value>Ignorados</value>
+  </data>
 </root>

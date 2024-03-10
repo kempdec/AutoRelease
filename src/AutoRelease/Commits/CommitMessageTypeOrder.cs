@@ -13,6 +13,11 @@ internal enum CommitMessageTypeOrder
     Default = 255,
 
     /// <summary>
+    /// <see cref="IgnoreCommitMessageType"/>.
+    /// </summary>
+    Ignore = 254,
+
+    /// <summary>
     /// <see cref="FeatCommitMessageType"/>.
     /// </summary>
     Feat = 0,
