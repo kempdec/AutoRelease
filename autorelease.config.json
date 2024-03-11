@@ -10,7 +10,8 @@
     "Types": [
       "feat=Novidades desta versão",
       "fix=Principais correções desta versão",
-      "chore=Notas técnicas"
+      "chore=Notas técnicas",
+      "docs=Documentação"
     ],
 
     // As substituições do início das mensagens de commit.
