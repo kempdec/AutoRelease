@@ -9,6 +9,8 @@ Use o sumário abaixo para escolher como quer aprender a usar o Auto Release.
 - [**GitHub Actions**](#github-actions) - Automatize a criação dos seus releases com o CI/CD do GitHub.
 - [**CLI (Interface de Linha de Comando)**](#cli-interface-de-linha-de-comando) - Crie os seus releases a partir do seu terminal.
 
+Depois, veja como escrever as suas mensagens de commit para usar todo o potencial do Auto Release [**clicando aqui**](#escrevendo-commits).
+
 ## Índice
 
 - [Auto Release](#auto-release)
@@ -19,6 +21,7 @@ Use o sumário abaixo para escolher como quer aprender a usar o Auto Release.
     - [Personalizando o fluxo de trabalho](#personalizando-o-fluxo-de-trabalho)
   - [CLI (Interface de Linha de Comando)](#cli-interface-de-linha-de-comando)
     - [Instalação](#instalação)
+  - [Escrevendo commits](#escrevendo-commits)
   - [Configurações](#configurações)
     - [Arquivo de configuração](#arquivo-de-configuração)
     - [Variáveis de ambiente](#variáveis-de-ambiente)
@@ -168,6 +171,51 @@ Exemplo: `autorelease create --help`.
 **A CLI também funciona com um arquivo de configuração do Auto Release.** Nos exemplos acima, o arquivo deveria estar em `C:\Users\ceo`, que é o caminho em que o terminal se encontra.
 
 Veja como usar um arquivo de configuração [clicando aqui.](#configurações)
+
+## Escrevendo commits
+
+O Auto Release usa o padrão do [**Conventional Commits**](https://www.conventionalcommits.org) (com poucas diferenças)
+para ler os commits e gerar o release automaticamente.
+
+Ou seja, a mensagem do commit deve ser estruturada da seguinte forma:
+
+> **Obs.: O Auto Release ainda não oferece suporte a escopos opcionais, mas em breve será adicionado o recurso.**
+
+``` txt
+<tipo>: <descrição>
+
+[corpo opcional]
+
+[rodapé(s) opcional(is)]
+```
+
+Os tipos `feat` e `fix`, operador `!`, e o texto `BREAKING CHANGE:` funcionam como está descrito em [**Conventional Commits**](https://www.conventionalcommits.org), com as seguintes diferenças:
+
+- Caso a propriedade `Types` (arquivo) ou `types` (CLI) seja especificada, o primeiro tipo terá o funcionamento de `feat`,
+de incrementar a versão `minor` e todos os demais tipos incrementarão a versão `patch`.
+- O texto `BREAKING CHANGE:` pode ser colocado em qualquer lugar do corpo ou rodapé, não sendo necessário estar no início do texto. Apenas se atente ao uso de `:` (2 pontos), o `BREAKING CHANGE:` sem os 2 pontos, não será considerado.
+- Caso o corpo ou rodapé da mensagem de commit for especificado, somente eles serão utilizados nas notas geradas pelo Auto Release.
+  
+  Exemplo da mensagem de commit:
+  ``` text
+  fix: Corrigir a criação de artigos.
+
+  Corrigido um problema em que quando a data de publicação era inferior a data de criação, o artigo não era criado.
+
+  Obs.: Somente de exemplo.
+  ```
+
+  As notas geradas serão semelhantes a abaixo:
+  
+  ``` text
+  # My Project v1.0.0 (2024-01-01)
+
+  # Correções
+  
+  - Corrigido um problema em que quando a data de publicação era inferior a data de criação, o artigo não era criado.
+    
+    Obs.: Somente de exemplo.
+  ```
 
 ## Configurações
 
