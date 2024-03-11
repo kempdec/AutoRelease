@@ -7,7 +7,7 @@ Gere automaticamente releases do seu projeto no GitHub usando o Auto Release.
 Use o sumário abaixo para escolher como quer aprender a usar o Auto Release.
 
 - [**GitHub Actions**](#github-actions) - Automatize a criação dos seus releases com o CI/CD do GitHub.
-- [**CLI (Interface de Linha de Comando)**](#cli) - Crie os seus releases a partir do seu terminal.
+- [**CLI (Interface de Linha de Comando)**](#cli-interface-de-linha-de-comando) - Crie os seus releases a partir do seu terminal.
 
 ## Índice
 
@@ -16,6 +16,9 @@ Use o sumário abaixo para escolher como quer aprender a usar o Auto Release.
   - [Índice](#índice)
   - [GitHub Actions](#github-actions)
     - [Criando um fluxo de trabalho simples no GitHub Actions](#criando-um-fluxo-de-trabalho-simples-no-github-actions)
+    - [Personalizando o fluxo de trabalho](#personalizando-o-fluxo-de-trabalho)
+  - [CLI (Interface de Linha de Comando)](#cli-interface-de-linha-de-comando)
+    - [Instalação](#instalação)
   - [Configurações](#configurações)
     - [Arquivo de configuração](#arquivo-de-configuração)
     - [Variáveis de ambiente](#variáveis-de-ambiente)
@@ -141,6 +144,30 @@ jobs:
           AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }} # Este token é fornecido pelo GitHub Actions, você não precisa criar seu próprio token.
           AutoRelease_Version: ${{ github.ref_name }}
 ```
+
+## CLI (Interface de Linha de Comando)
+
+### Instalação
+
+Instale a ferramenta a partir do SDK do .NET.
+
+``` powershell
+dotnet tool install -g autorelease
+```
+
+Digite o comando `autorelease --help` em seu Terminal para que seja impresso a ajuda.
+
+![Opção "--help" na CLI do Auto Release](assets/readme/cli-help.png)
+
+Para imprimir a ajuda de algum comando, informe ele e em seguida a opção `--help`.
+
+Exemplo: `autorelease create --help`.
+
+![Opção "--help" para o comando "create" na CLI do Auto Release](assets/readme/cli-create-help.png)
+
+**A CLI também funciona com um arquivo de configuração do Auto Release.** Nos exemplos acima, o arquivo deveria estar em `C:\Users\ceo`, que é o caminho em que o terminal se encontra.
+
+Veja como usar um arquivo de configuração [clicando aqui.](#configurações)
 
 ## Configurações
 
