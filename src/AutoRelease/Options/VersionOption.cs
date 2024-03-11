@@ -2,6 +2,7 @@
 using Semver;
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using System.Text.RegularExpressions;
 
 namespace KempDec.AutoRelease.Options;
 
@@ -23,7 +24,7 @@ internal class VersionOption : Option<SemVersion?>
     /// </summary>
     /// <param name="result">O resultado do argumento da opção.</param>
     /// <returns>O tipo esperado da opção.</returns>
-    private static SemVersion? ParseArgument(ArgumentResult result)
+    internal static SemVersion? ParseArgument(ArgumentResult result)
     {
         string? version = result.GetSingleTokenOrDefault();
 
@@ -31,6 +32,8 @@ internal class VersionOption : Option<SemVersion?>
         {
             return null;
         }
+
+        version = Regex.Replace(version, @"^\D*", string.Empty);
 
         if (!SemVersion.TryParse(version, SemVersionStyles.Strict, out SemVersion semVersion))
         {

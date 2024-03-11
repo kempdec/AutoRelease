@@ -2,6 +2,7 @@
 using Semver;
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using System.Text.RegularExpressions;
 
 namespace KempDec.AutoRelease.Options;
 
@@ -38,6 +39,8 @@ internal class FirstVersionOption : Option<SemVersion>
         {
             return Default;
         }
+
+        version = Regex.Replace(version, @"^\D*", string.Empty);
 
         if (!SemVersion.TryParse(version, SemVersionStyles.Strict, out SemVersion semVersion))
         {
