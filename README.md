@@ -1,3 +1,4 @@
+
 # Auto Release
 
 Gere automaticamente releases do seu projeto no GitHub usando o Auto Release.
@@ -179,7 +180,7 @@ para ler os commits e gerar o release automaticamente.
 
 Ou seja, a mensagem do commit deve ser estruturada da seguinte forma:
 
-> **Obs.: O Auto Release ainda não oferece suporte a escopos opcionais, mas em breve será adicionado o recurso.**
+> **Obs.: O Auto Release ainda não oferece suporte a escopos, mas em breve será adicionado o recurso.**
 
 ``` txt
 <tipo>: <descrição>
@@ -189,12 +190,12 @@ Ou seja, a mensagem do commit deve ser estruturada da seguinte forma:
 [rodapé(s) opcional(is)]
 ```
 
-Os tipos `feat` e `fix`, operador `!`, e o texto `BREAKING CHANGE:` funcionam como está descrito em [**Conventional Commits**](https://www.conventionalcommits.org), com as seguintes diferenças:
+Os tipos `feat` e `fix` e o operador `!` funcionam como está descrito em [**Conventional Commits**](https://www.conventionalcommits.org), com as seguintes diferenças:
 
 - Caso a propriedade `Types` (arquivo) ou `types` (CLI) seja especificada, o primeiro tipo terá o funcionamento de `feat`,
 de incrementar a versão `minor` e todos os demais tipos incrementarão a versão `patch`.
-- O texto `BREAKING CHANGE:` pode ser colocado em qualquer lugar do corpo ou rodapé, não sendo necessário estar no início do texto. Apenas se atente ao uso de `:` (2 pontos), o `BREAKING CHANGE:` sem os 2 pontos, não será considerado.
 - Caso o corpo ou rodapé da mensagem de commit for especificado, somente eles serão utilizados nas notas geradas pelo Auto Release.
+- O texto `BREAKING CHANGE:` não é utilizado como sinalizador para quebra de compatbilidade, somente o operador `!`, mas você pode usar os 2 em conjunto.
   
   Exemplo da mensagem de commit:
   ``` text

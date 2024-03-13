@@ -55,7 +55,6 @@ internal class CommitMessage
         }
 
         OriginMessage = message;
-        IsBreakingChange = IsBreakingChange || body?.Contains("BREAKING CHANGE:") is true;
         Type = commitType ?? new DefaultCommitMessageType();
         Description = description;
         Body = body;
@@ -129,31 +128,18 @@ internal class CommitMessage
     /// <returns>A mensagem de commit separada em tipo, descrição e corpo.</returns>
     private static (string? Type, string Description, string? Body) SplitMessage(string message)
     {
-        var messages = message.Split(": ");
-
-        string description;
-        string? type = null;
-        string? body = null;
-
-        if (messages.Length >= 2)
-        {
-            type = messages[0];
-            description = messages[1];
-        }
-        else
-        {
-            description = messages[0];
-        }
-
         string doubleBreakLine = "\n\n";
 
-        if (description.Contains(doubleBreakLine))
-        {
-            var descriptions = description.Split(doubleBreakLine);
+        string[] lines = message.Split(doubleBreakLine);
+        string[] messages = lines[0].Split(": ");
 
-            description = descriptions[0];
-            body = string.Join($"{doubleBreakLine}  ", descriptions[1..]);
-        }
+        (string? type, string description) = messages switch
+        {
+            { Length: >= 2 } => (messages[0], messages[1]),
+            _ => (null, messages[0])
+        };
+
+        string? body = lines.Length > 1 ? string.Join($"{doubleBreakLine}  ", lines[1..]) : null;
 
         return (type, description, body);
     }
