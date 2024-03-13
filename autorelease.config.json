@@ -42,12 +42,15 @@
       "Refatorar a ": "Foi refatorada a ",
 
       // Corrigir.
-      "Corrigir": "Corrigido um problema em que"
+      "Corrigir": "Foi corrigido",
+      "Corrigir o ": "Foi corrigido o ",
+      "Corrigir a ": "Foi corrigido a "
     },
 
     // Os inícios das mensagens de commit que serão ignoradas.
     "Ignores": [
-      "Refatorar."
+      "Refatorar.",
+      "Merge"
     ],
 
     // A primeira versão do repositório.

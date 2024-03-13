@@ -40,9 +40,9 @@ internal class CreateSubCommand
 
         GitHubClient github = GitHubClientHelper.Create(inputs.Token);
 
-        var release = new NewRelease(version)
+        var release = new NewRelease($"{inputs.VersionPrefix}{version}")
         {
-            Name = $"{inputs.ProjectName ?? inputs.Repo.Name} v{version} ({DateTime.Now:yyyy-MM-dd})",
+            Name = $"{inputs.ProjectName ?? inputs.Repo.Name} {inputs.VersionPrefix}{version} ({DateTime.Now:yyyy-MM-dd})",
             Body = noteResult.Value,
             Draft = inputs.Draft,
             Prerelease = inputs.PreRelease,
