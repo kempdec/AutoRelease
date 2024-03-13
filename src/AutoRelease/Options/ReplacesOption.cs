@@ -46,6 +46,6 @@ internal class ReplacesOption : Option<List<(string OldValue, string NewValue)>>
             replaces.Add((oldValue, newValue));
         }
 
-        return replaces;
+        return [.. replaces.OrderByDescending(e => e.OldValue.Length)];
     }
 }
