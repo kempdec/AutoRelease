@@ -34,6 +34,7 @@ internal class CommitMessage
         (string? type, string description, string? body) = SplitMessage(message);
 
         ICommitMessageType? commitType = null;
+        bool useBodyAsReleaseDescription = false;
 
         if (type is not null)
         {
@@ -41,6 +42,10 @@ internal class CommitMessage
             {
                 case '#':
                     commitType = new IgnoreCommitMessageType();
+                    break;
+
+                case '^':
+                    useBodyAsReleaseDescription = true;
                     break;
 
                 case '!':
@@ -58,7 +63,20 @@ internal class CommitMessage
         Type = commitType ?? new DefaultCommitMessageType();
         Description = description;
         Body = body;
-        ReleaseDescription = body ?? Description;
+
+        if (useBodyAsReleaseDescription && body is not null)
+        {
+            ReleaseDescription = body;
+        }
+        else
+        {
+            ReleaseDescription = Description;
+
+            if (body is not null)
+            {
+                ReleaseDescription += DoubleHtmlBreakLine + body;
+            }
+        }
 
         if (!string.IsNullOrWhiteSpace(authorName))
         {
@@ -78,6 +96,11 @@ internal class CommitMessage
             }
         }
     }
+
+    /// <summary>
+    /// A quebra de linha dupla em HTML.
+    /// </summary>
+    private const string DoubleHtmlBreakLine = "<br><br>";
 
     /// <summary>
     /// Obtém a mensagem de origem da mensagem de commit.
@@ -128,9 +151,7 @@ internal class CommitMessage
     /// <returns>A mensagem de commit separada em tipo, descrição e corpo.</returns>
     private static (string? Type, string Description, string? Body) SplitMessage(string message)
     {
-        string doubleBreakLine = "\n\n";
-
-        string[] lines = message.Split(doubleBreakLine);
+        string[] lines = message.Split("\n\n");
         string[] messages = lines[0].Split(": ");
 
         (string? type, string description) = messages switch
@@ -139,7 +160,7 @@ internal class CommitMessage
             _ => (null, messages[0])
         };
 
-        string? body = lines.Length > 1 ? string.Join($"{doubleBreakLine}  ", lines[1..]) : null;
+        string? body = lines.Length > 1 ? string.Join(DoubleHtmlBreakLine, lines[1..]) : null;
 
         return (type, description, body);
     }
