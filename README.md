@@ -175,6 +175,8 @@ Veja como usar um arquivo de configuração [clicando aqui.](#configurações)
 
 ## Escrevendo commits
 
+### Conventional Commits
+
 O Auto Release usa o padrão do [**Conventional Commits**](https://www.conventionalcommits.org) (com poucas diferenças)
 para ler os commits e gerar o release automaticamente.
 
@@ -194,7 +196,6 @@ Os tipos `feat` e `fix` e o operador `!` funcionam como está descrito em [**Con
 
 - Caso a propriedade `Types` (arquivo) ou `types` (CLI) seja especificada, o primeiro tipo terá o funcionamento de `feat`,
 de incrementar a versão `minor` e todos os demais tipos incrementarão a versão `patch`.
-- Caso o corpo ou rodapé da mensagem de commit for especificado, somente eles serão utilizados nas notas geradas pelo Auto Release.
 - O texto `BREAKING CHANGE:` não é utilizado como sinalizador para quebra de compatbilidade, somente o operador `!`, mas você pode usar os 2 em conjunto.
   
   Exemplo da mensagem de commit:
@@ -217,6 +218,28 @@ de incrementar a versão `minor` e todos os demais tipos incrementarão a versã
     
     Obs.: Somente de exemplo.
   ```
+
+### Operadores
+
+Você pode utilizar operadores para que o Auto Release trate as suas mensagens de commit de maneira diferente.
+Atualmente é possível utilizar somente um operador por vez.
+
+Para utilizar um operador, coloque-o no final do tipo da mensagem de commit e antes do separador : (dois pontos).
+
+Exemplo com o operador `^`:
+``` txt
+feat^: Essa descrição será ignorada.
+
+Somente esse corpo será adicionado as notas do release.
+```
+
+Os operadores disponíveis são:
+
+| **Operador** | **Descrição** |
+| ------------ | ------------- |
+| `!`          | A mensagem de commit traz uma quebra de compatibilidade e a versão `major` deve ser incrementada. |
+| `#`          | A mensagem de commit deve ser ignorada e não deve ser adicionada as notas do release. |
+| `^`          | A mensagem de commit deve ter somente o seu corpo adicionado as notas de release, ou seja, a sua descrição deve ser ignorada. |
 
 ## Configurações
 
