@@ -35,7 +35,7 @@ Depois, veja como escrever as suas mensagens de commit para usar todo o potencia
 
 ## GitHub Actions
 
-Para começar a usar o Auto Release no GitHub Actions é muito fácil, siga os passos abaixo e diga adeus a escrever
+Para começar a usar o [Auto Release no GitHub Actions](https://github.com/marketplace/actions/auto-release-action) é muito fácil, siga os passos abaixo e diga adeus a escrever
 releases manualmente.
 
 ### Criando um fluxo de trabalho simples no GitHub Actions
