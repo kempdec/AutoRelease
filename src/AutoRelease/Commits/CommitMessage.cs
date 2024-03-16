@@ -40,6 +40,8 @@ internal class CommitMessage
 
         if (type is not null)
         {
+            bool typeHasOperator = true;
+
             switch (type.Last())
             {
                 case '#':
@@ -53,6 +55,15 @@ internal class CommitMessage
                 case '!':
                     IsBreakingChange = true;
                     break;
+
+                default:
+                    typeHasOperator = false;
+                    break;
+            }
+
+            if (typeHasOperator)
+            {
+                type = type[..^1];
             }
         }
 
