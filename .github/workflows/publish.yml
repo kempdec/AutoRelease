@@ -10,15 +10,15 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "A versão do release a ser criado."
+        description: "version: A versão do release a ser criado."
         required: false
 
       branch:
-        description: "O branch do repositório do release a ser criado."
+        description: "branch: O branch do repositório do release a ser criado."
         required: false
 
       pre-release:
-        description: "Um sinalizador indicando se o release é um pre-release."
+        description: "pre-release: Um sinalizador indicando se o release é um pre-release."
         type: boolean
         required: false
 
