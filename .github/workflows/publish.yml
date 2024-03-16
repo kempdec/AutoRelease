@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: Criar release
         id: release
-        uses: kempdec/autorelease-action@v1
+        uses: kempdec/autorelease-action@v2
         env:
           AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }}
           AutoRelease_Branch: ${{ github.event.inputs.branch }}
