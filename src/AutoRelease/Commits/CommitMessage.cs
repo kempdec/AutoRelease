@@ -17,7 +17,8 @@ internal class CommitMessage
     /// <param name="commit">O commit.</param>
     /// <param name="inputs">As entradas do subcomando <see cref="NoteSubCommand"/>.</param>
     public CommitMessage(Commit commit, INoteSubCommandInputs inputs)
-        : this(commit.Message, inputs.Types, inputs.Replaces, inputs.ShowAuthor ? commit.Author.Name : null)
+        : this(commit.Message, inputs.Types, inputs.Replaces, inputs.Ignores,
+            inputs.ShowAuthor ? commit.Author.Name : null)
     {
     }
 
@@ -27,13 +28,14 @@ internal class CommitMessage
     /// <param name="message">A mensagem de commit.</param>
     /// <param name="types">Os tipos de mensagem de commit.</param>
     /// <param name="replaces">As substituições do início das mensagens de commit.</param>
+    /// <param name="ignores">Os inícios das mensagens de commit que serão ignoradas.</param>
     /// <param name="authorName">O nome do autor da mensagem de commit.</param>
     public CommitMessage(string message, List<CommitMessageType>? types = null,
-        List<(string OldValue, string NewValue)>? replaces = null, string? authorName = null)
+        List<(string OldValue, string NewValue)>? replaces = null, List<string>? ignores = null,
+        string? authorName = null)
     {
         (string? type, string description, string? body) = SplitMessage(message);
 
-        ICommitMessageType? commitType = null;
         bool useBodyAsReleaseDescription = false;
 
         if (type is not null)
@@ -41,7 +43,7 @@ internal class CommitMessage
             switch (type.Last())
             {
                 case '#':
-                    commitType = new IgnoreCommitMessageType();
+                    Ignore = true;
                     break;
 
                 case '^':
@@ -54,6 +56,8 @@ internal class CommitMessage
             }
         }
 
+        ICommitMessageType? commitType = null;
+
         if (commitType is null && type is not null)
         {
             commitType = types is { Count: > 0 } ? types.SingleOrDefault(e => e.Key == type) : GetType(type);
@@ -63,6 +67,7 @@ internal class CommitMessage
         Type = commitType ?? new DefaultCommitMessageType();
         Description = description;
         Body = body;
+        Ignore = Ignore || ignores?.Any(Description.StartsWith) is true;
 
         if (useBodyAsReleaseDescription && body is not null)
         {
@@ -128,9 +133,14 @@ internal class CommitMessage
     public string? Body { get; }
 
     /// <summary>
-    /// Obtém um sinalizador indicando se a mensagem de commit é traz uma quebra de compatibilidade.
+    /// Obtém um sinalizador indicando se a mensagem de commit traz uma quebra de compatibilidade.
     /// </summary>
     public bool IsBreakingChange { get; }
+
+    /// <summary>
+    /// Obtém um sinalizador indicando se a mensagem de commit deve ser ignorada.
+    /// </summary>
+    public bool Ignore { get; }
 
     /// <summary>
     /// Obtém a representação do tipo da mensagem de commit especificado.
