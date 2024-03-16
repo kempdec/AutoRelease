@@ -77,7 +77,7 @@ jobs:
 
     steps:
       - name: Criar Release
-        uses: kempdec/autorelease-action@v1
+        uses: kempdec/autorelease-action@v2
         env:
           AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }} # Este token é fornecido pelo GitHub Actions, você não precisa criar seu próprio token.
 ```
@@ -118,7 +118,7 @@ jobs:
 
     steps:
       - name: Criar Release
-        uses: kempdec/autorelease-action@v1
+        uses: kempdec/autorelease-action@v2
         env:
           AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }} # Este token é fornecido pelo GitHub Actions, você não precisa criar seu próprio token.
 ```
@@ -143,7 +143,7 @@ jobs:
 
     steps:
       - name: Criar Release
-        uses: kempdec/autorelease-action@v1
+        uses: kempdec/autorelease-action@v2
         env:
           AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }} # Este token é fornecido pelo GitHub Actions, você não precisa criar seu próprio token.
           AutoRelease_Version: ${{ github.ref_name }}
