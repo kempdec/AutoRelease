@@ -44,7 +44,12 @@
       // Corrigir.
       "Corrigir": "Foi corrigido",
       "Corrigir o ": "Foi corrigido o ",
-      "Corrigir a ": "Foi corrigido a "
+      "Corrigir a ": "Foi corrigido a ",
+
+      // Aprimorar
+      "Aprimorar": "Foi aprimorado",
+      "Aprimorar o ": "Foi aprimorado o ",
+      "Aprimorar a ": "Foi aprimorada a "
     },
 
     // Os inícios das mensagens de commit que serão ignoradas.
