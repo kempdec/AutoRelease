@@ -84,6 +84,7 @@ internal class NoteSubCommand : SubCommandBase<NoteSubCommandBinder, NoteSubComm
             .Select(e => new CommitMessage(e.Commit, inputs))
             .Where(e => !e.Ignore)
             .Reverse()
+            .DistinctBy(e => e.ReleaseDescription)
             .GroupBy(e => e.Type)
             .OrderBy(e => e.Key.Ordering)
             .ToList();
