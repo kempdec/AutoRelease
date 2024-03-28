@@ -80,23 +80,23 @@ internal class CommitMessage
         Body = body;
         Ignore = Ignore || ignores?.Any(Description.StartsWith) is true;
 
+        if (!string.IsNullOrWhiteSpace(authorName))
+        {
+            authorName = $" [{authorName}]";
+        }
+
         if (useBodyAsReleaseDescription && body is not null)
         {
-            ReleaseDescription = body;
+            ReleaseDescription = body + authorName;
         }
         else
         {
-            ReleaseDescription = Description;
+            ReleaseDescription = Description + authorName;
 
             if (body is not null)
             {
                 ReleaseDescription += DoubleHtmlBreakLine + body;
             }
-        }
-
-        if (!string.IsNullOrWhiteSpace(authorName))
-        {
-            ReleaseDescription += $" [{authorName}]";
         }
 
         if (replaces is not { Count: > 0 })
