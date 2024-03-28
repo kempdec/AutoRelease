@@ -7,6 +7,11 @@
 internal interface INoteSubCommandConfig
 {
     /// <summary>
+    /// Obtém ou define a versão do release.
+    /// </summary>
+    public string? Version { get; set; }
+
+    /// <summary>
     /// Obtém ou inicializa os tipos das mensagens de commit.
     /// </summary>
     public List<string>? Types { get; init; }

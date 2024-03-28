@@ -1,9 +1,11 @@
 ﻿using KempDec.AutoRelease.Commits;
+using KempDec.AutoRelease.Extensions;
 using KempDec.AutoRelease.Helper;
 using KempDec.AutoRelease.SubCommands.Binders;
 using KempDec.AutoRelease.SubCommands.Inputs;
 using KempDec.AutoRelease.SubCommands.Results;
 using Octokit;
+using Semver;
 using System.Text;
 
 namespace KempDec.AutoRelease.SubCommands;
@@ -29,10 +31,28 @@ internal class NoteSubCommand : SubCommandBase<NoteSubCommandBinder, NoteSubComm
 
         try
         {
-            Release githubLatestRelease = await github.Repository.Release.GetLatest(inputs.Repo.Owner,
-                inputs.Repo.Name);
+            RepositoryTag? lastTag = null;
 
-            since = githubLatestRelease.PublishedAt;
+            if (inputs.Version is not null)
+            {
+                var tagsOptions = new ApiOptions
+                {
+                    PageCount = 1,
+                    PageSize = 10
+                };
+
+                IReadOnlyList<RepositoryTag> tags = await github.Repository.GetAllTags(inputs.Repo.Owner,
+                    inputs.Repo.Name, tagsOptions);
+
+                lastTag = tags.FirstOrDefault(tag => tag.Name.ToSemVersion() is SemVersion version
+                    && inputs.Version.ComparePrecedenceTo(version) > 0);
+            }
+
+            Release githubPreviousRelease = lastTag is not null
+                ? await github.Repository.Release.Get(inputs.Repo.Owner, inputs.Repo.Name, lastTag.Name)
+                : await github.Repository.Release.GetLatest(inputs.Repo.Owner, inputs.Repo.Name);
+
+            since = githubPreviousRelease.PublishedAt;
         }
         catch (AuthorizationException)
         {

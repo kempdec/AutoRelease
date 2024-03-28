@@ -9,6 +9,10 @@ namespace KempDec.AutoRelease.Configurations.Commands;
 internal record NoteSubCommandConfig : INoteSubCommandConfig
 {
     /// <inheritdoc/>
+    [ConfigOption<VersionOption>]
+    public string? Version { get; set; }
+
+    /// <inheritdoc/>
     [ConfigOption<TypesOption>]
     public List<string>? Types { get; init; }
 

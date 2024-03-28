@@ -1,4 +1,5 @@
 ﻿using KempDec.AutoRelease.Commits;
+using Semver;
 
 namespace KempDec.AutoRelease.SubCommands.Inputs;
 
@@ -7,6 +8,11 @@ namespace KempDec.AutoRelease.SubCommands.Inputs;
 /// </summary>
 internal interface INoteSubCommandInputs : IGlobalInputs
 {
+    /// <summary>
+    /// Obtém ou define a versão do release.
+    /// </summary>
+    public SemVersion? Version { get; set; }
+
     /// <summary>
     /// Obtém ou define os tipos das mensagens de commit.
     /// </summary>

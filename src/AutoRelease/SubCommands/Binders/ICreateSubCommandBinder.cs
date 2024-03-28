@@ -8,11 +8,6 @@ namespace KempDec.AutoRelease.SubCommands.Binders;
 internal interface ICreateSubCommandBinder : INoteSubCommandBinder, IVersionSubCommandBinder
 {
     /// <summary>
-    /// Obtém ou inicializa a opção da versão do release.
-    /// </summary>
-    public VersionOption VersionOption { get; init; }
-
-    /// <summary>
     /// Obtém ou inicializa a opção do nome do projeto.
     /// </summary>
     public ProjectNameOption ProjectNameOption { get; init; }

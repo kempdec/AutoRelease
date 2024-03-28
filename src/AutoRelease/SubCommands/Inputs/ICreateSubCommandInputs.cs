@@ -1,5 +1,4 @@
 ﻿using KempDec.AutoRelease.SubCommands.Models;
-using Semver;
 
 namespace KempDec.AutoRelease.SubCommands.Inputs;
 
@@ -8,11 +7,6 @@ namespace KempDec.AutoRelease.SubCommands.Inputs;
 /// </summary>
 internal interface ICreateSubCommandInputs : INoteSubCommandInputs, IVersionSubCommandInputs
 {
-    /// <summary>
-    /// Obtém ou define a versão do release.
-    /// </summary>
-    public SemVersion? Version { get; set; }
-
     /// <summary>
     /// Obtém ou define o nome do projeto.
     /// </summary>

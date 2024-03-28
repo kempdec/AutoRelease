@@ -36,6 +36,8 @@
 
   // As configurações do subcomando de geração automática das notas do release.
   "NoteCommand": {
+    // A versão do release.
+    "Version": null,
     // Os tipos das mensagens de commit.
     "Types": null,
     // As substituições do início das mensagens de commit.

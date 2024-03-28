@@ -11,6 +11,9 @@ internal class NoteSubCommandBinder
     : GlobalBinder<NoteSubCommandInputs, INoteSubCommandInputs>, INoteSubCommandBinder
 {
     /// <inheritdoc/>
+    public VersionOption VersionOption { get; init; } = new();
+
+    /// <inheritdoc/>
     public TypesOption TypesOption { get; init; } = new();
 
     /// <inheritdoc/>
@@ -27,6 +30,7 @@ internal class NoteSubCommandBinder
     {
         NoteSubCommandInputs inputs = base.GetBoundValue(bindingContext);
 
+        inputs.Version = bindingContext.ParseResult.GetValueForOption(VersionOption);
         inputs.Types = bindingContext.ParseResult.GetValueForOption(TypesOption)!;
         inputs.Replaces = bindingContext.ParseResult.GetValueForOption(ReplacesOption)!;
         inputs.Ignores = bindingContext.ParseResult.GetValueForOption(IgnoresOption)!;

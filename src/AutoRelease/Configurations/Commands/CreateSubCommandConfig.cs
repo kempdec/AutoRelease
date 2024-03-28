@@ -10,12 +10,6 @@ namespace KempDec.AutoRelease.Configurations.Commands;
 internal class CreateSubCommandConfig : INoteSubCommandConfig, IVersionSubCommandConfig
 {
     /// <summary>
-    /// Obtém ou define a versão do release.
-    /// </summary>
-    [ConfigOption<VersionOption>]
-    public string? Version { get; set; }
-
-    /// <summary>
     /// Obtém ou define o nome do projeto.
     /// </summary>
     [ConfigOption<ProjectNameOption>]
@@ -40,6 +34,10 @@ internal class CreateSubCommandConfig : INoteSubCommandConfig, IVersionSubComman
     public CreateOutputType? OutputType { get; set; }
 
     #region Note.
+
+    /// <inheritdoc/>
+    [ConfigOption<VersionOption>]
+    public string? Version { get; set; }
 
     /// <inheritdoc/>
     [ConfigOption<TypesOption>]

@@ -40,9 +40,7 @@ internal class FirstVersionOption : Option<SemVersion>
             return Default;
         }
 
-        version = Regex.Replace(version, @"^\D*", string.Empty);
-
-        if (!SemVersion.TryParse(version, SemVersionStyles.Strict, out SemVersion semVersion))
+        if (version.ToSemVersion() is not SemVersion semVersion)
         {
             result.ErrorMessage = "A primeira versão não é uma versão semântica 2.0 válida.";
 

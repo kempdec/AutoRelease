@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "AutoRelease": {
+    "AutoRelease Note": {
       "commandName": "Project",
       "commandLineArgs": "note"
+    },
+    "AutoRelease Create": {
+      "commandName": "Project",
+      "commandLineArgs": "create"
     }
   }
 }

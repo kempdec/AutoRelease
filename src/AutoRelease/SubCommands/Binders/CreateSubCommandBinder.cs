@@ -11,9 +11,6 @@ internal class CreateSubCommandBinder
     : GlobalBinder<CreateSubCommandInputs, ICreateSubCommandInputs>, ICreateSubCommandBinder
 {
     /// <inheritdoc/>
-    public VersionOption VersionOption { get; init; } = new();
-
-    /// <inheritdoc/>
     public ProjectNameOption ProjectNameOption { get; init; } = new();
 
     /// <inheritdoc/>
@@ -26,6 +23,9 @@ internal class CreateSubCommandBinder
     public CreateOutputTypeOption OutputTypeOption { get; init; } = new();
 
     #region Notes.
+
+    /// <inheritdoc/>
+    public VersionOption VersionOption { get; init; } = new();
 
     /// <inheritdoc/>
     public TypesOption TypesOption { get; init; } = new();

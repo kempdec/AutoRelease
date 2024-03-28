@@ -8,6 +8,11 @@ namespace KempDec.AutoRelease.SubCommands.Binders;
 internal interface INoteSubCommandBinder : IGlobalBinder
 {
     /// <summary>
+    /// Obtém ou inicializa a opção da versão do release.
+    /// </summary>
+    public VersionOption VersionOption { get; init; }
+
+    /// <summary>
     /// Obtém ou inicializa a opção dos tipos das mensagens de commit.
     /// </summary>
     public TypesOption TypesOption { get; init; }

@@ -1,4 +1,5 @@
 ﻿using KempDec.AutoRelease.Commits;
+using Semver;
 
 namespace KempDec.AutoRelease.SubCommands.Inputs;
 
@@ -7,6 +8,9 @@ namespace KempDec.AutoRelease.SubCommands.Inputs;
 /// </summary>
 internal class NoteSubCommandInputs : GlobalInputs, INoteSubCommandInputs
 {
+    /// <inheritdoc/>
+    public SemVersion? Version { get; set; }
+
     /// <inheritdoc/>
     public List<CommitMessageType> Types { get; set; } = null!;
 

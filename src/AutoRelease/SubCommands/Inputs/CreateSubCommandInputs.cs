@@ -10,9 +10,6 @@ namespace KempDec.AutoRelease.SubCommands.Inputs;
 internal class CreateSubCommandInputs : GlobalInputs, ICreateSubCommandInputs
 {
     /// <inheritdoc/>
-    public SemVersion? Version { get; set; }
-
-    /// <inheritdoc/>
     public string? ProjectName { get; set; }
 
     /// <inheritdoc/>
@@ -25,6 +22,9 @@ internal class CreateSubCommandInputs : GlobalInputs, ICreateSubCommandInputs
     public CreateOutputType OutputType { get; set; }
 
     #region Notes.
+
+    /// <inheritdoc/>
+    public SemVersion? Version { get; set; }
 
     /// <inheritdoc/>
     public List<CommitMessageType> Types { get; set; } = null!;

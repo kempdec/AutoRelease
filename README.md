@@ -385,10 +385,17 @@ AutoRelease_CreateCommand__Types="feat=\"Novidades\" fix=\"Correções\" chore=\
 | `PreRelease`  | `pre-release`   | `boolean`  | `false`    | Um sinalizador indicando se o release é um pre-release.<br>Exemplo: `false`. |
 | `OutputType`  | `output-type`   | `string`   | `Id`       | O tipo de saída da criação automática do release.<br>Os valores aceitos são: `Id`, `UploadUrl` ou `Version` |
 
+#### NoteCommand
+
+| **Arquivo**   | **CLI**         | **Tipo**   | **Padrão** | **Sumário** |
+| ------------- | --------------- | ---------- | ---------- | ----------- |
+| `Version`     | `version`       | `string?`  | `null`     | A versão do release [**(SemVer 2.0)**](https://semver.org).<br>Quando especificado, as notas do release serão geradas com base nas mensagens de commit desde a versão anterior da versão especificada.<br>Exemplo: `1.3.0`. |
+
 #### CreateComand e NoteCommand
 
 | **Arquivo**   | **CLI**         | **Tipo**   | **Padrão** | **Sumário** |
 | ------------- | --------------- | ---------- | ---------- | ----------- |
+| `Version`     | `version`       | `string?`  | `null`     | A versão do release [**(SemVer 2.0)**](https://semver.org).<br>Quando especificada, a versão do release não será gerada automaticamente. O uso dessa propriedade é recomendado somente de forma dinâmica, como em uma variável de ambiente definida através do GitHub Actions.<br>Exemplo: `1.3.0`. |
 | `Types`       | `types`         | `string[]` | `null`     | Os tipos das mensagens de commit.<br><br>Exemplo arquivo:<br>`["feat=Novidades", "fix=Correções", "chore=Notas técnicas"]`.<br><br>Exemplo CLI:<br>`feat="Novidades" fix="Correções" chore="Notas técnicas"`.<br><br>**A ordem dos tipos definirá também a ordem que são escritos nas notas do release.** Neste exemplo, as `Novidades` serão listadas primeiro. |
 | `Replaces`    | `replaces`      | `object`   | `null`     | As substituições do início das mensagens de commit.<br><br>Exemplo arquivo:<br>`{"Adicionar a ": "Foi adicionada a ", "Corrigir": "Foi corrigido"}`.<br><br>Exemplo CLI:<br>`"Adicionar a "="Foi adicionada a " "Corrigir"="Foi corrigido"`.<br><br>Usando a seguinte mensagem de commit como exemplo:<br>`feat: Adicionar a página de cadastro de usuários.`<br><br>Na geração das notas do release, ela seria substituída por:<br>`Foi adicionada a página de cadastro de usuários.` |
 | `Ignores`     | `ignores`       | `string[]` | `null`     | Os inícios das mensagens de commit que serão ignoradas.<br><br>Exemplo arquivo:<br>`["Refatorar.", "Atualizar a versão"]`.<br><br>Exemplo CLI:<br>`"Refatorar" "Atualizar a versão"`.<br><br>Usando a seguinte mensagem de commit como exemplo:<br>`chore: Atualizar a versão do pacote.`<br><br>Ela seria ignorada, por começar com `Atualizar a versão`.<br><br>**Você também pode ignorar uma mensagem de commit usando o operador `#`.**<br><br>No exemplo abaixo, a mensagem de commit será ignorada, independente de estar ou não em `Ignores`:<br>`chore#: Atualizar a versão do pacote.` |
