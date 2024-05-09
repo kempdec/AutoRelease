@@ -44,8 +44,8 @@
 
   <ItemGroup>
     <PackageReference Include="KempDec.StarterDotNet.Console" Version="0.13.0" />
-    <PackageReference Include="KempDec.StarterDotNet.Reflection" Version="0.11.1" />
-    <PackageReference Include="Octokit" Version="10.0.0" />
+    <PackageReference Include="KempDec.StarterDotNet.Reflection" Version="0.13.0" />
+    <PackageReference Include="Octokit" Version="11.0.1" />
     <PackageReference Include="Semver" Version="2.3.0" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
