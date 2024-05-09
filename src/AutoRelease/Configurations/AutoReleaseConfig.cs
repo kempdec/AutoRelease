@@ -1,5 +1,5 @@
 ﻿using KempDec.AutoRelease.Configurations.Attributes;
-using Microsoft.Extensions.Configuration;
+using KempDec.StarterDotNet.Console;
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -9,7 +9,7 @@ namespace KempDec.AutoRelease.Configurations;
 /// <summary>
 /// Associação recursiva das configurações do Auto Release.
 /// </summary>
-internal partial record AutoReleaseConfig
+internal partial record AutoReleaseConfig : AppSettingsBase<AutoReleaseConfig>
 {
     /// <summary>
     /// A instância estática de <see cref="AutoReleaseConfig"/>.
@@ -19,25 +19,9 @@ internal partial record AutoReleaseConfig
     /// <summary>
     /// Obtém a instância estática de <see cref="AutoReleaseConfig"/>.
     /// </summary>
-    public static AutoReleaseConfig Instance
-    {
-        get
-        {
-            if (s_instance is null)
-            {
-                string configPath = Path.Combine(Environment.CurrentDirectory, "autorelease.config.json");
-
-                IConfigurationRoot configuration = new ConfigurationBuilder()
-                    .AddJsonFile(configPath, optional: true)
-                    .AddEnvironmentVariables(prefix: "AutoRelease_")
-                    .Build();
-
-                s_instance = configuration.Get<AutoReleaseConfig>() ?? new AutoReleaseConfig();
-            }
-
-            return s_instance;
-        }
-    }
+    public static AutoReleaseConfig Instance =>
+        s_instance ??= GetInstance(fileName: "autorelease.config.json", optional: true,
+            environmentVariablePrefix: "AutoRelease_");
 
     /// <summary>
     /// Define os argumentos a serem analisados com base nas configurações do Auto Release.
