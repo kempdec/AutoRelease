@@ -95,7 +95,7 @@ internal class CommitMessage
 
             if (body is not null)
             {
-                ReleaseDescription += DoubleHtmlBreakLine + body;
+                ReleaseDescription += HtmlBreakLine + body;
             }
         }
 
@@ -114,9 +114,9 @@ internal class CommitMessage
     }
 
     /// <summary>
-    /// A quebra de linha dupla em HTML.
+    /// A quebra de linha em HTML.
     /// </summary>
-    private const string DoubleHtmlBreakLine = "<br><br>";
+    private const string HtmlBreakLine = "<br>";
 
     /// <summary>
     /// Obtém a mensagem de origem da mensagem de commit.
@@ -172,7 +172,7 @@ internal class CommitMessage
     /// <returns>A mensagem de commit separada em tipo, descrição e corpo.</returns>
     private static (string? Type, string Description, string? Body) SplitMessage(string message)
     {
-        string[] lines = message.Split("\n\n");
+        string[] lines = message.Split("\n");
         string[] messages = lines[0].Split(": ");
 
         (string? type, string description) = messages switch
@@ -181,7 +181,7 @@ internal class CommitMessage
             _ => (null, messages[0])
         };
 
-        string? body = lines.Length > 1 ? string.Join(DoubleHtmlBreakLine, lines[1..]) : null;
+        string? body = lines.Length > 1 ? string.Join(HtmlBreakLine, lines[1..]) : null;
 
         return (type, description, body);
     }
