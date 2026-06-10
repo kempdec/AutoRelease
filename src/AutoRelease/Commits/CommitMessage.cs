@@ -69,7 +69,7 @@ internal class CommitMessage
 
         ICommitMessageType? commitType = null;
 
-        if (commitType is null && type is not null)
+        if (type is not null)
         {
             commitType = types is { Count: > 0 } ? types.SingleOrDefault(e => e.Key == type) : GetType(type);
         }
@@ -173,7 +173,7 @@ internal class CommitMessage
     private static (string? Type, string Description, string? Body) SplitMessage(string message)
     {
         string[] lines = message.Split("\n");
-        string[] messages = lines[0].Split(": ");
+        string[] messages = lines[0].Split(": ", count: 2);
 
         (string? type, string description) = messages switch
         {

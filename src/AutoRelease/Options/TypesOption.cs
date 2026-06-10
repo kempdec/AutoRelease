@@ -22,7 +22,7 @@ internal class TypesOption : Option<List<CommitMessageType>>
             for (byte i = 0; i < result.Tokens.Count; i++)
             {
                 Token token = result.Tokens[i];
-                (string? key, string? label) = token.Value.Split('=');
+                (string? key, string? label) = token.Value.Split('=', count: 2);
 
                 if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(label))
                 {
