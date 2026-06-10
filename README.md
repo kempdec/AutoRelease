@@ -182,7 +182,7 @@ para ler os commits e gerar o release automaticamente.
 
 Ou seja, a mensagem do commit deve ser estruturada da seguinte forma:
 
-> **Obs.: O Auto Release ainda não oferece suporte a escopos, mas em breve será adicionado o recurso.**
+> **Obs.: O Auto Release ainda não oferece suporte a escopos do Conventional Commits.**
 
 ``` txt
 <tipo>: <descrição>
