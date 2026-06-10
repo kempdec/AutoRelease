@@ -23,10 +23,17 @@ internal class NoteSubCommand : SubCommandBase<NoteSubCommandBinder, NoteSubComm
     }
 
     /// <inheritdoc/>
-    public override async Task<SubCommandResult> HandleResultAsync(INoteSubCommandInputs inputs)
-    {
-        GitHubClient github = GitHubClientHelper.Create(inputs.Token);
+    public override Task<SubCommandResult> HandleResultAsync(INoteSubCommandInputs inputs) =>
+        HandleResultAsync(inputs, GitHubClientHelper.Create(inputs.Token));
 
+    /// <summary>
+    /// Manipula o resultado do comando reutilizando o cliente do GitHub especificado.
+    /// </summary>
+    /// <param name="inputs">As entradas do subcomando.</param>
+    /// <param name="github">O cliente do GitHub a ser reutilizado entre os subcomandos.</param>
+    /// <returns>A <see cref="Task"/> que representa a operação assíncrona, contendo o resultado do comando.</returns>
+    public async Task<SubCommandResult> HandleResultAsync(INoteSubCommandInputs inputs, GitHubClient github)
+    {
         DateTimeOffset? since = null;
 
         try

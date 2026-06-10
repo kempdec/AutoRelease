@@ -23,7 +23,11 @@ internal class CreateSubCommand
     /// <inheritdoc/>
     public override async Task<SubCommandResult> HandleResultAsync(ICreateSubCommandInputs inputs)
     {
-        SubCommandResult noteResult = await new NoteSubCommand().HandleResultAsync(inputs);
+        // Um único cliente do GitHub é criado e reutilizado pelos subcomandos note e version e pela criação do
+        // release, evitando instanciar um cliente para cada etapa.
+        GitHubClient github = GitHubClientHelper.Create(inputs.Token);
+
+        SubCommandResult noteResult = await new NoteSubCommand().HandleResultAsync(inputs, github);
 
         string version;
 
@@ -33,12 +37,10 @@ internal class CreateSubCommand
         }
         else
         {
-            SubCommandResult versionResult = await new VersionSubCommand().HandleResultAsync(inputs);
+            SubCommandResult versionResult = await new VersionSubCommand().HandleResultAsync(inputs, github);
 
             version = versionResult.Value!;
         }
-
-        GitHubClient github = GitHubClientHelper.Create(inputs.Token);
 
         var release = new NewRelease($"{inputs.VersionPrefix}{version}")
         {

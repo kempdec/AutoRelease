@@ -23,9 +23,17 @@ internal class VersionSubCommand
     }
 
     /// <inheritdoc/>
-    public override async Task<SubCommandResult> HandleResultAsync(IVersionSubCommandInputs inputs)
+    public override Task<SubCommandResult> HandleResultAsync(IVersionSubCommandInputs inputs) =>
+        HandleResultAsync(inputs, GitHubClientHelper.Create(inputs.Token));
+
+    /// <summary>
+    /// Manipula o resultado do comando reutilizando o cliente do GitHub especificado.
+    /// </summary>
+    /// <param name="inputs">As entradas do subcomando.</param>
+    /// <param name="github">O cliente do GitHub a ser reutilizado entre os subcomandos.</param>
+    /// <returns>A <see cref="Task"/> que representa a operação assíncrona, contendo o resultado do comando.</returns>
+    public async Task<SubCommandResult> HandleResultAsync(IVersionSubCommandInputs inputs, GitHubClient github)
     {
-        GitHubClient github = GitHubClientHelper.Create(inputs.Token);
         SemVersion? version = null;
         DateTimeOffset? since = null;
 
