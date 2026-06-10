@@ -5,7 +5,7 @@ namespace KempDec.AutoRelease.Helper;
 /// <summary>
 /// Classe com métodos auxiliares para <see cref="GitHubClient"/>.
 /// </summary>
-internal class GitHubClientHelper
+internal static class GitHubClientHelper
 {
     /// <summary>
     /// Cria uma nova instância de <see cref="GitHubClient"/>.
