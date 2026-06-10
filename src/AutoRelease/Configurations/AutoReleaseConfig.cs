@@ -81,7 +81,7 @@ internal partial record AutoReleaseConfig : AppSettingsBase<AutoReleaseConfig>
                 $"{property.Name} para o tipo de um comando.");
 
         // Verifica se nos argumentos NÃO foi definido o comando.
-        if (!command.Aliases.Any(args.Contains))
+        if (!args.Contains(command.Name) && !command.Aliases.Any(args.Contains))
         {
             return null;
         }
@@ -129,7 +129,7 @@ internal partial record AutoReleaseConfig : AppSettingsBase<AutoReleaseConfig>
                 $"{property.Name} para o tipo da opção de um comando.");
 
         // Verifica se nos argumentos já foi definida a opção.
-        if (option.Aliases.Any(args.Contains))
+        if (args.Contains(option.Name) || option.Aliases.Any(args.Contains))
         {
             return null;
         }
@@ -143,7 +143,7 @@ internal partial record AutoReleaseConfig : AppSettingsBase<AutoReleaseConfig>
                 return null;
             }
 
-            return [option.Aliases.First(), .. dictionary.Select(e => $"{e.Key}={e.Value}")];
+            return [option.Name, .. dictionary.Select(e => $"{e.Key}={e.Value}")];
         }
         else if (propertyValue is List<string> list)
         {
@@ -152,7 +152,7 @@ internal partial record AutoReleaseConfig : AppSettingsBase<AutoReleaseConfig>
                 return null;
             }
 
-            return [option.Aliases.First(), .. list];
+            return [option.Name, .. list];
         }
 
         string? resultValue = propertyValue?.ToString();
@@ -162,6 +162,6 @@ internal partial record AutoReleaseConfig : AppSettingsBase<AutoReleaseConfig>
             return null;
         }
 
-        return [option.Aliases.First(), resultValue];
+        return [option.Name, resultValue];
     }
 }

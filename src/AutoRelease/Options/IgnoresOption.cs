@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 
 namespace KempDec.AutoRelease.Options;
 
@@ -10,8 +10,9 @@ internal class IgnoresOption : Option<List<string>>
     /// <summary>
     /// Inicializa uma nova instância de <see cref="IgnoresOption"/>.
     /// </summary>
-    public IgnoresOption() : base(
-        name: "--ignores",
-        description: "Os inícios das mensagens de commit que serão ignoradas.") =>
-            AllowMultipleArgumentsPerToken = true;
+    public IgnoresOption() : base("--ignores")
+    {
+        Description = "Os inícios das mensagens de commit que serão ignoradas.";
+        AllowMultipleArgumentsPerToken = true;
+    }
 }

@@ -1,7 +1,6 @@
-﻿using KempDec.AutoRelease.Options;
+using KempDec.AutoRelease.Options;
 using KempDec.AutoRelease.SubCommands.Inputs;
 using System.CommandLine;
-using System.CommandLine.Binding;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -12,7 +11,7 @@ namespace KempDec.AutoRelease.SubCommands.Binders;
 /// </summary>
 /// <typeparam name="TInputs">O tipo das entradas do ficheiro global dos comandos.</typeparam>
 /// <typeparam name="TIInputs">O tipo da interface das entradas do ficheiro global dos comandos.</typeparam>
-internal class GlobalBinder<TInputs, TIInputs> : BinderBase<TInputs>, IGlobalBinder
+internal class GlobalBinder<TInputs, TIInputs> : IGlobalBinder
     where TInputs : TIInputs, new()
     where TIInputs : IGlobalInputs
 {
@@ -38,15 +37,19 @@ internal class GlobalBinder<TInputs, TIInputs> : BinderBase<TInputs>, IGlobalBin
                 continue;
             }
 
-            command.AddOption(value);
+            command.Options.Add(value);
         }
     }
 
-    /// <inheritdoc/>
-    protected override TInputs GetBoundValue(BindingContext bindingContext) => new()
+    /// <summary>
+    /// Obtém as entradas do subcomando a partir do resultado da análise especificado.
+    /// </summary>
+    /// <param name="parseResult">O resultado da análise dos argumentos.</param>
+    /// <returns>As entradas do subcomando.</returns>
+    public virtual TInputs GetInputs(ParseResult parseResult) => new()
     {
-        Token = bindingContext.ParseResult.GetValueForOption(TokenOption)!,
-        Repo = bindingContext.ParseResult.GetValueForOption(RepoOption),
-        Branch = bindingContext.ParseResult.GetValueForOption(BranchOption)
+        Token = parseResult.GetValue(TokenOption)!,
+        Repo = parseResult.GetValue(RepoOption),
+        Branch = parseResult.GetValue(BranchOption)
     };
 }

@@ -1,6 +1,7 @@
-﻿using KempDec.AutoRelease.Options;
+using KempDec.AutoRelease.Options;
 using KempDec.AutoRelease.SubCommands.Inputs;
-using System.CommandLine.Binding;
+using System.CommandLine;
+using VersionOption = KempDec.AutoRelease.Options.VersionOption;
 
 namespace KempDec.AutoRelease.SubCommands.Binders;
 
@@ -52,29 +53,29 @@ internal class CreateSubCommandBinder
     #endregion
 
     /// <inheritdoc/>
-    protected override CreateSubCommandInputs GetBoundValue(BindingContext bindingContext)
+    public override CreateSubCommandInputs GetInputs(ParseResult parseResult)
     {
-        CreateSubCommandInputs inputs = base.GetBoundValue(bindingContext);
+        CreateSubCommandInputs inputs = base.GetInputs(parseResult);
 
-        inputs.Version = bindingContext.ParseResult.GetValueForOption(VersionOption);
-        inputs.ProjectName = bindingContext.ParseResult.GetValueForOption(ProjectNameOption);
-        inputs.Draft = bindingContext.ParseResult.GetValueForOption(DraftOption);
-        inputs.PreRelease = bindingContext.ParseResult.GetValueForOption(PreReleaseOption);
-        inputs.OutputType = bindingContext.ParseResult.GetValueForOption(OutputTypeOption);
+        inputs.Version = parseResult.GetValue(VersionOption);
+        inputs.ProjectName = parseResult.GetValue(ProjectNameOption);
+        inputs.Draft = parseResult.GetValue(DraftOption);
+        inputs.PreRelease = parseResult.GetValue(PreReleaseOption);
+        inputs.OutputType = parseResult.GetValue(OutputTypeOption);
 
         #region Notes.
 
-        inputs.Types = bindingContext.ParseResult.GetValueForOption(TypesOption)!;
-        inputs.Replaces = bindingContext.ParseResult.GetValueForOption(ReplacesOption)!;
-        inputs.Ignores = bindingContext.ParseResult.GetValueForOption(IgnoresOption)!;
-        inputs.ShowAuthor = bindingContext.ParseResult.GetValueForOption(ShowAuthorOption);
+        inputs.Types = parseResult.GetValue(TypesOption)!;
+        inputs.Replaces = parseResult.GetValue(ReplacesOption)!;
+        inputs.Ignores = parseResult.GetValue(IgnoresOption)!;
+        inputs.ShowAuthor = parseResult.GetValue(ShowAuthorOption);
 
         #endregion
 
         #region Version.
 
-        inputs.FirstVersion = bindingContext.ParseResult.GetValueForOption(FirstVersionOption);
-        inputs.VersionPrefix = bindingContext.ParseResult.GetValueForOption(VersionPrefixOption)!;
+        inputs.FirstVersion = parseResult.GetValue(FirstVersionOption);
+        inputs.VersionPrefix = parseResult.GetValue(VersionPrefixOption)!;
 
         #endregion
 

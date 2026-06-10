@@ -1,6 +1,7 @@
-﻿using KempDec.AutoRelease.Options;
+using KempDec.AutoRelease.Options;
 using KempDec.AutoRelease.SubCommands.Inputs;
-using System.CommandLine.Binding;
+using System.CommandLine;
+using VersionOption = KempDec.AutoRelease.Options.VersionOption;
 
 namespace KempDec.AutoRelease.SubCommands.Binders;
 
@@ -26,15 +27,15 @@ internal class NoteSubCommandBinder
     public ShowAuthorOption ShowAuthorOption { get; init; } = new();
 
     /// <inheritdoc/>
-    protected override NoteSubCommandInputs GetBoundValue(BindingContext bindingContext)
+    public override NoteSubCommandInputs GetInputs(ParseResult parseResult)
     {
-        NoteSubCommandInputs inputs = base.GetBoundValue(bindingContext);
+        NoteSubCommandInputs inputs = base.GetInputs(parseResult);
 
-        inputs.Version = bindingContext.ParseResult.GetValueForOption(VersionOption);
-        inputs.Types = bindingContext.ParseResult.GetValueForOption(TypesOption)!;
-        inputs.Replaces = bindingContext.ParseResult.GetValueForOption(ReplacesOption)!;
-        inputs.Ignores = bindingContext.ParseResult.GetValueForOption(IgnoresOption)!;
-        inputs.ShowAuthor = bindingContext.ParseResult.GetValueForOption(ShowAuthorOption);
+        inputs.Version = parseResult.GetValue(VersionOption);
+        inputs.Types = parseResult.GetValue(TypesOption)!;
+        inputs.Replaces = parseResult.GetValue(ReplacesOption)!;
+        inputs.Ignores = parseResult.GetValue(IgnoresOption)!;
+        inputs.ShowAuthor = parseResult.GetValue(ShowAuthorOption);
 
         return inputs;
     }

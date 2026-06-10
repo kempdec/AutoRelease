@@ -1,8 +1,7 @@
-﻿using KempDec.AutoRelease.Extensions;
+using KempDec.AutoRelease.Extensions;
 using Semver;
 using System.CommandLine;
 using System.CommandLine.Parsing;
-using System.Text.RegularExpressions;
 
 namespace KempDec.AutoRelease.Options;
 
@@ -14,11 +13,10 @@ internal class FirstVersionOption : Option<SemVersion>
     /// <summary>
     /// Inicializa uma nova instância de <see cref="FirstVersionOption"/>.
     /// </summary>
-    public FirstVersionOption() : base(
-        name: "--first-version",
-        description: "A primeira versão do repositório.",
-        parseArgument: ParseArgument)
+    public FirstVersionOption() : base("--first-version")
     {
+        Description = "A primeira versão do repositório.";
+        CustomParser = ParseArgument;
     }
 
     /// <summary>
@@ -42,7 +40,7 @@ internal class FirstVersionOption : Option<SemVersion>
 
         if (version.ToSemVersion() is not SemVersion semVersion)
         {
-            result.ErrorMessage = "A primeira versão não é uma versão semântica 2.0 válida.";
+            result.AddError("A primeira versão não é uma versão semântica 2.0 válida.");
 
             return default!;
         }

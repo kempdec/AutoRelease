@@ -1,8 +1,7 @@
-﻿using KempDec.AutoRelease.Extensions;
+using KempDec.AutoRelease.Extensions;
 using Semver;
 using System.CommandLine;
 using System.CommandLine.Parsing;
-using System.Text.RegularExpressions;
 
 namespace KempDec.AutoRelease.Options;
 
@@ -14,10 +13,11 @@ internal class VersionOption : Option<SemVersion?>
     /// <summary>
     /// Inicializa uma nova instância de <see cref="VersionOption"/>.
     /// </summary>
-    public VersionOption() : base(
-        name: "--version",
-        description: "A versão do release.",
-        parseArgument: ParseArgument) => AddAlias("-v");
+    public VersionOption() : base("--version", "-v")
+    {
+        Description = "A versão do release.";
+        CustomParser = ParseArgument;
+    }
 
     /// <summary>
     /// Analisa o resultado do argumento especificado para o tipo esperado da opção.
@@ -35,7 +35,7 @@ internal class VersionOption : Option<SemVersion?>
 
         if (version.ToSemVersion() is not SemVersion semVersion)
         {
-            result.ErrorMessage = "A versão não é uma versão semântica 2.0 válida.";
+            result.AddError("A versão não é uma versão semântica 2.0 válida.");
 
             return default!;
         }

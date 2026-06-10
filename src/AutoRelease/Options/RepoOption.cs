@@ -1,4 +1,4 @@
-﻿using KempDec.AutoRelease.Extensions;
+using KempDec.AutoRelease.Extensions;
 using System.CommandLine;
 
 namespace KempDec.AutoRelease.Options;
@@ -11,16 +11,17 @@ internal class RepoOption : Option<(string Owner, string Name)>
     /// <summary>
     /// Inicializa uma nova instância de <see cref="RepoOption"/>.
     /// </summary>
-    public RepoOption() : base(name: "--repo",
-        description: "O repositório que contém os commits no GitHub",
-        isDefault: true,
-        parseArgument: result =>
+    public RepoOption() : base("--repo", "-r")
+    {
+        Description = "O repositório que contém os commits no GitHub";
+        Required = true;
+        CustomParser = result =>
         {
             string? repo = result.GetSingleTokenOrDefault();
 
             if (string.IsNullOrWhiteSpace(repo))
             {
-                result.ErrorMessage = "O repositório que contém os commits no GitHub não pode estar vazio.";
+                result.AddError("O repositório que contém os commits no GitHub não pode estar vazio.");
 
                 return default;
             }
@@ -29,22 +30,18 @@ internal class RepoOption : Option<(string Owner, string Name)>
 
             if (string.IsNullOrWhiteSpace(repoOwner) || string.IsNullOrWhiteSpace(repoName))
             {
-                result.ErrorMessage = """
+                result.AddError("""
                 O nome do proprietário ou do repositório não podem estar vazios.
-                
+
                 Especifique no seguinte formato:
 
                 owner/repository
-                """;
+                """);
 
                 return default;
             }
 
             return (repoOwner, repoName);
-        })
-    {
-        IsRequired = true;
-
-        AddAlias("-r");
+        };
     }
 }

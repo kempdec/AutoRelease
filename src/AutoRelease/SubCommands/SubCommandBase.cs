@@ -20,13 +20,13 @@ internal abstract class SubCommandBase<TBinder, TInputs, TIInputs> : Command
     /// Inicializa uma nova instância de <see cref="SubCommandBase{TBinder, TInputs, TIInputs}"/>.
     /// </summary>
     /// <inheritdoc/>
-    protected SubCommandBase(string name, string? description = null) : base(name, description)
+    protected SubCommandBase(string name, string? description = null) : base(name, description ?? "")
     {
         var binder = new TBinder();
 
         binder.AddOptionsTo(command: this);
 
-        this.SetHandler(HandleAsync, binder);
+        this.SetAction((parseResult, _) => HandleAsync(binder.GetInputs(parseResult)));
     }
 
     /// <summary>

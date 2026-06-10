@@ -1,4 +1,4 @@
-﻿using KempDec.AutoRelease.SubCommands.Models;
+using KempDec.AutoRelease.SubCommands.Models;
 using System.CommandLine;
 
 namespace KempDec.AutoRelease.Options;
@@ -6,10 +6,14 @@ namespace KempDec.AutoRelease.Options;
 /// <summary>
 /// Representa a opção do tipo de saída da criação automática do release.
 /// </summary>
-/// <remarks>Inicializa uma nova instância de <see cref="CreateOutputTypeOption"/>.</remarks>
-internal class CreateOutputTypeOption() : Option<CreateOutputType>(
-    name: "--output-type",
-    description: "O tipo de saída da criação automática do release.",
-    getDefaultValue: () => CreateOutputType.Id)
+internal class CreateOutputTypeOption : Option<CreateOutputType>
 {
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="CreateOutputTypeOption"/>.
+    /// </summary>
+    public CreateOutputTypeOption() : base("--output-type")
+    {
+        Description = "O tipo de saída da criação automática do release.";
+        DefaultValueFactory = _ => CreateOutputType.Id;
+    }
 }

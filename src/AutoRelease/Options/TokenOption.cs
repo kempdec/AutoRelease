@@ -1,4 +1,4 @@
-﻿using KempDec.AutoRelease.Extensions;
+using KempDec.AutoRelease.Extensions;
 using System.CommandLine;
 
 namespace KempDec.AutoRelease.Options;
@@ -11,25 +11,22 @@ internal class TokenOption : Option<string>
     /// <summary>
     /// Inicializa uma nova instância de <see cref="TokenOption"/>.
     /// </summary>
-    public TokenOption() : base(name: "--token",
-        description: "O token para acesso ao repositório no GitHub.",
-        isDefault: true,
-        parseArgument: result =>
+    public TokenOption() : base("--token", "-t")
+    {
+        Description = "O token para acesso ao repositório no GitHub.";
+        Required = true;
+        CustomParser = result =>
         {
             string? token = result.GetSingleTokenOrDefault();
 
             if (string.IsNullOrWhiteSpace(token))
             {
-                result.ErrorMessage = "O token para acesso ao repositório no GitHub não pode estar vazio.";
+                result.AddError("O token para acesso ao repositório no GitHub não pode estar vazio.");
 
                 return default!;
             }
 
             return token;
-        })
-    {
-        IsRequired = true;
-
-        AddAlias("-t");
+        };
     }
 }

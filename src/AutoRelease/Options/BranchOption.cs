@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 
 namespace KempDec.AutoRelease.Options;
 
@@ -10,6 +10,6 @@ internal class BranchOption : Option<string?>
     /// <summary>
     /// Inicializa uma nova instância de <see cref="BranchOption"/>.
     /// </summary>
-    public BranchOption() : base(name: "--branch",
-        description: "O branch do repositório no GitHub.") => AddAlias("-b");
+    public BranchOption() : base("--branch", "-b") =>
+        Description = "O branch do repositório no GitHub.";
 }

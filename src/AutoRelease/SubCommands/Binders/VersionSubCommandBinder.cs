@@ -1,6 +1,6 @@
-﻿using KempDec.AutoRelease.Options;
+using KempDec.AutoRelease.Options;
 using KempDec.AutoRelease.SubCommands.Inputs;
-using System.CommandLine.Binding;
+using System.CommandLine;
 
 namespace KempDec.AutoRelease.SubCommands.Binders;
 
@@ -17,12 +17,12 @@ internal class VersionSubCommandBinder
     public VersionPrefixOption VersionPrefixOption { get; init; } = new();
 
     /// <inheritdoc/>
-    protected override VersionSubCommandInputs GetBoundValue(BindingContext bindingContext)
+    public override VersionSubCommandInputs GetInputs(ParseResult parseResult)
     {
-        VersionSubCommandInputs inputs = base.GetBoundValue(bindingContext);
+        VersionSubCommandInputs inputs = base.GetInputs(parseResult);
 
-        inputs.FirstVersion = bindingContext.ParseResult.GetValueForOption(FirstVersionOption);
-        inputs.VersionPrefix = bindingContext.ParseResult.GetValueForOption(VersionPrefixOption)!;
+        inputs.FirstVersion = parseResult.GetValue(FirstVersionOption);
+        inputs.VersionPrefix = parseResult.GetValue(VersionPrefixOption)!;
 
         return inputs;
     }

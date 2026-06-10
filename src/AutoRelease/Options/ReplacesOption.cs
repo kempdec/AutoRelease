@@ -1,4 +1,4 @@
-﻿using KempDec.AutoRelease.Extensions;
+using KempDec.AutoRelease.Extensions;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 
@@ -12,10 +12,12 @@ internal class ReplacesOption : Option<List<(string OldValue, string NewValue)>>
     /// <summary>
     /// Inicializa uma nova instância de <see cref="ReplacesOption"/>.
     /// </summary>
-    public ReplacesOption() : base(
-        name: "--replaces",
-        description: "As substituições do início das mensagens de commit.",
-        parseArgument: ParsedArgument) => AllowMultipleArgumentsPerToken = true;
+    public ReplacesOption() : base("--replaces")
+    {
+        Description = "As substituições do início das mensagens de commit.";
+        CustomParser = ParsedArgument;
+        AllowMultipleArgumentsPerToken = true;
+    }
 
     /// <summary>
     /// Analisa o resultado do argumento especificado para o tipo esperado da opção.
@@ -32,13 +34,13 @@ internal class ReplacesOption : Option<List<(string OldValue, string NewValue)>>
 
             if (string.IsNullOrWhiteSpace(oldValue) || string.IsNullOrWhiteSpace(newValue))
             {
-                result.ErrorMessage = """
+                result.AddError("""
                     Não foi possível definir as substituições do início das mensagens de commit.
 
                     As substituições do início das mensagens de commit devem estar no formato:
 
                     oldValue1=newValue1 oldValue2=newValue2
-                    """;
+                    """);
 
                 return default!;
             }

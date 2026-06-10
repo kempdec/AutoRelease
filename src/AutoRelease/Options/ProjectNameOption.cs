@@ -1,11 +1,15 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 
 namespace KempDec.AutoRelease.Options;
 
 /// <summary>
 /// Representa a opção do nome do projeto.
 /// </summary>
-/// <remarks>Inicializa uma nova instância de <see cref="ProjectNameOption"/>.</remarks>
-internal class ProjectNameOption() : Option<string?>(name: "--project-name", description: "O nome do projeto.")
+internal class ProjectNameOption : Option<string?>
 {
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="ProjectNameOption"/>.
+    /// </summary>
+    public ProjectNameOption() : base("--project-name") =>
+        Description = "O nome do projeto.";
 }
