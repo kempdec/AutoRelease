@@ -45,21 +45,26 @@ internal abstract class SubCommandBase<TBinder, TInputs, TIInputs> : Command
     {
         SubCommandResult result = await HandleResultAsync(inputs);
 
-        if (string.IsNullOrWhiteSpace(result.Value))
+        if (!result.Succeeded)
         {
+            // Define um código de saída diferente de zero para que falhas (por exemplo, no GitHub Actions) sejam
+            // sinalizadas corretamente, em vez de o processo encerrar como sucesso.
+            Environment.ExitCode = 1;
+
+            if (!string.IsNullOrWhiteSpace(result.Value))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(result.Value);
+                Console.ResetColor();
+            }
+
             return;
         }
 
-        if (result.Succeeded)
+        if (!string.IsNullOrWhiteSpace(result.Value))
         {
             await Console.Out.WriteLineAsync(result.Value);
-
-            return;
         }
-
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine(result.Value);
-        Console.ResetColor();
     }
 
     /// <summary>
