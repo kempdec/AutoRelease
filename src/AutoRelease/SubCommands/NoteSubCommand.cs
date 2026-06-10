@@ -35,17 +35,18 @@ internal class NoteSubCommand : SubCommandBase<NoteSubCommandBinder, NoteSubComm
 
             if (inputs.Version is not null)
             {
-                var tagsOptions = new ApiOptions
-                {
-                    PageCount = 1,
-                    PageSize = 10
-                };
-
                 IReadOnlyList<RepositoryTag> tags = await github.Repository.GetAllTags(inputs.Repo.Owner,
-                    inputs.Repo.Name, tagsOptions);
+                    inputs.Repo.Name);
 
-                lastTag = tags.FirstOrDefault(tag => tag.Name.ToSemVersion() is SemVersion version
-                    && inputs.Version.ComparePrecedenceTo(version) > 0);
+                // Entre todas as tags com versão anterior à versão informada, seleciona a de maior precedência (a
+                // versão imediatamente anterior). Antes, apenas as 10 tags mais recentes eram consideradas e a
+                // primeira correspondência (em ordem não garantida) era usada, o que podia ignorar a tag correta.
+                lastTag = tags
+                    .Select(tag => (Tag: tag, Version: tag.Name.ToSemVersion()))
+                    .Where(e => e.Version is not null && inputs.Version.ComparePrecedenceTo(e.Version) > 0)
+                    .OrderByDescending(e => e.Version!, SemVersion.PrecedenceComparer)
+                    .Select(e => e.Tag)
+                    .FirstOrDefault();
             }
 
             Release githubPreviousRelease = lastTag is not null
