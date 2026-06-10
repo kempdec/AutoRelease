@@ -55,6 +55,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="AutoRelease.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Resources\CommitTypesResource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
