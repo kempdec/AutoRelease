@@ -42,7 +42,7 @@ internal class CreateSubCommand
 
         var release = new NewRelease($"{inputs.VersionPrefix}{version}")
         {
-            Name = $"{inputs.ProjectName ?? inputs.Repo.Name} {inputs.VersionPrefix}{version} ({DateTime.Now:yyyy-MM-dd})",
+            Name = $"{inputs.ProjectName ?? inputs.Repo.Name} {inputs.VersionPrefix}{version} ({DateTimeOffset.UtcNow:yyyy-MM-dd})",
             Body = noteResult.Value,
             Draft = inputs.Draft,
             Prerelease = inputs.PreRelease,
