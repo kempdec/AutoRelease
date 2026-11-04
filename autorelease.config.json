@@ -61,5 +61,15 @@
 
     // A primeira versão do repositório.
     "FirstVersion": "0.1.0"
+  },
+
+  // As regras do lint, que o fluxo "Conferir" aplica a cada push e pull request.
+  "LintCommand": {
+    // O título termina em ponto final.
+    "RequirePeriod": true,
+    // O título tem no máximo 120 caracteres.
+    "MaxHeaderLength": 120,
+    // A autoria fica nos metadados do commit, e não num rodapé.
+    "ForbiddenTrailers": [ "Co-Authored-By" ]
   }
 }
