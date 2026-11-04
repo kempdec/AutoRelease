@@ -2,56 +2,51 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>KempDec.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>KempDec.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <InvariantGlobalization>true</InvariantGlobalization>
     <PackageId>AutoRelease</PackageId>
     <Title>Auto Release</Title>
     <Authors>KempDec</Authors>
     <Company>KempDec Brasil Ltda.</Company>
     <Product>Auto Release</Product>
-    <Description>Gere automaticamente releases do seu projeto no GitHub usando o Auto Release.</Description>
-    <Copyright>2024 © KempDec Brasil Ltda.</Copyright>
+    <Description>Gere automaticamente as releases do seu projeto no GitHub a partir das mensagens de commit.</Description>
+    <Copyright>2024-2026 © KempDec Brasil Ltda.</Copyright>
     <PackageProjectUrl>https://github.com/kempdec/AutoRelease</PackageProjectUrl>
     <RepositoryUrl>https://github.com/kempdec/AutoRelease</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>github;release;release-automation;</PackageTags>
-    <PackAsTool>True</PackAsTool>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageTags>github;release;release-automation;conventional-commits;semver;changelog</PackageTags>
+    <PackAsTool>true</PackAsTool>
     <ToolCommandName>autorelease</ToolCommandName>
     <PackageOutputPath>..\..\published</PackageOutputPath>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <!-- Sem a versão no pacote, o `dotnet pack` local sai como 1.0.0 e pode ser confundido com uma versão publicada. -->
+    <Version>0.0.0-local</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\assets\icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\..\LICENSE.txt">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+    <None Include="..\..\assets\icon.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="KempDec.StarterDotNet.Console" Version="0.13.0" />
-    <PackageReference Include="KempDec.StarterDotNet.Reflection" Version="0.13.0" />
-    <PackageReference Include="Octokit" Version="11.0.1" />
-    <PackageReference Include="Semver" Version="2.3.0" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.14" />
+    <PackageReference Include="Octokit" Version="14.0.0" />
+    <PackageReference Include="Semver" Version="3.0.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.14" />
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="KempDec.AutoRelease" />
+    <InternalsVisibleTo Include="KempDec.AutoRelease.Tests" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,5 +63,5 @@
       <LastGenOutput>CommitTypesResource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-	
+
 </Project>

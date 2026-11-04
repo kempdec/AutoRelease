@@ -1,191 +1,172 @@
-﻿using KempDec.AutoRelease.Commits.Types;
-using KempDec.AutoRelease.SubCommands;
-using KempDec.AutoRelease.SubCommands.Inputs;
-using KempDec.StarterDotNet.Reflection;
-using Octokit;
+﻿using System.Text.RegularExpressions;
 
 namespace KempDec.AutoRelease.Commits;
 
 /// <summary>
-/// Representa uma mensagem de commit.
+/// Representa uma mensagem de commit lida no formato do Conventional Commits, com os operadores do Auto Release.
 /// </summary>
-internal class CommitMessage
+/// <remarks>
+/// O título segue <c>tipo(escopo)operadores: descrição</c>, em que o escopo e os operadores são opcionais. Os
+/// operadores ficam colados ao tipo, antes dos dois-pontos: <c>!</c> marca a quebra de compatibilidade, <c>#</c> tira o
+/// commit das notas e da conta da versão, e <c>^</c> usa o corpo no lugar da descrição. Uma mensagem fora do formato
+/// continua sendo lida: ela fica sem tipo, e a descrição é o título inteiro.
+/// </remarks>
+internal sealed partial record CommitMessage
 {
     /// <summary>
-    /// Inicializa uma nova instância de <see cref="CommitMessage"/>.
+    /// Obtém a mensagem original, como veio do commit.
     /// </summary>
-    /// <param name="commit">O commit.</param>
-    /// <param name="inputs">As entradas do subcomando <see cref="NoteSubCommand"/>.</param>
-    public CommitMessage(Commit commit, INoteSubCommandInputs inputs)
-        : this(commit.Message, inputs.Types, inputs.Replaces, inputs.Ignores,
-            inputs.ShowAuthor ? commit.Author.Name : null)
+    public required string Original { get; init; }
+
+    /// <summary>
+    /// Obtém o tipo, em minúsculas, ou <see langword="null"/> quando a mensagem não segue o formato.
+    /// </summary>
+    public string? Type { get; init; }
+
+    /// <summary>
+    /// Obtém o escopo, ou <see langword="null"/> quando a mensagem não tem.
+    /// </summary>
+    public string? Scope { get; init; }
+
+    /// <summary>
+    /// Obtém a descrição: o título depois dos dois-pontos, ou o título inteiro quando a mensagem não segue o formato.
+    /// </summary>
+    public required string Description { get; init; }
+
+    /// <summary>
+    /// Obtém as linhas do corpo, sem as linhas em branco das pontas e sem os rodapés do Git.
+    /// </summary>
+    public IReadOnlyList<string> Body { get; init; } = [];
+
+    /// <summary>
+    /// Obtém um sinalizador indicando se o commit quebra a compatibilidade, pelo operador <c>!</c> ou pelo rodapé
+    /// <c>BREAKING CHANGE:</c>.
+    /// </summary>
+    public bool IsBreakingChange { get; init; }
+
+    /// <summary>
+    /// Obtém um sinalizador indicando se o commit leva o operador <c>#</c>, que o tira das notas e da conta da versão.
+    /// </summary>
+    public bool IsHidden { get; init; }
+
+    /// <summary>
+    /// Obtém um sinalizador indicando se o commit leva o operador <c>^</c>, que usa o corpo no lugar da descrição.
+    /// </summary>
+    public bool UsesBodyAsDescription { get; init; }
+
+    /// <summary>
+    /// Obtém um sinalizador indicando se a mensagem segue o formato <c>tipo: descrição</c>.
+    /// </summary>
+    public bool IsConventional => Type is not null;
+
+    /// <summary>
+    /// Lê uma mensagem de commit.
+    /// </summary>
+    /// <param name="message">A mensagem, com o título na primeira linha.</param>
+    /// <returns>A mensagem lida.</returns>
+    public static CommitMessage Parse(string message)
     {
-    }
+        ArgumentNullException.ThrowIfNull(message);
 
-    /// <summary>
-    /// Inicializa uma nova instância de <see cref="CommitMessage"/>.
-    /// </summary>
-    /// <param name="message">A mensagem de commit.</param>
-    /// <param name="types">Os tipos de mensagem de commit.</param>
-    /// <param name="replaces">As substituições do início das mensagens de commit.</param>
-    /// <param name="ignores">Os inícios das mensagens de commit que serão ignoradas.</param>
-    /// <param name="authorName">O nome do autor da mensagem de commit.</param>
-    public CommitMessage(string message, List<CommitMessageType>? types = null,
-        List<(string OldValue, string NewValue)>? replaces = null, List<string>? ignores = null,
-        string? authorName = null)
-    {
-        (string? type, string description, string? body) = SplitMessage(message);
+        string[] lines = message.ReplaceLineEndings("\n").Split('\n');
+        string header = lines[0].Trim();
+        (IReadOnlyList<string> body, IReadOnlyList<string> footers) = SplitBodyAndFooters(lines[1..]);
+        bool breakingFooter = footers.Any(footer => BreakingFooterRegex().IsMatch(footer));
 
-        bool useBodyAsReleaseDescription = false;
+        Match match = HeaderRegex().Match(header);
 
-        if (type is not null)
+        if (!match.Success)
         {
-            bool typeHasOperator = true;
-
-            switch (type.Last())
+            return new CommitMessage
             {
-                case '#':
-                    Ignore = true;
-                    break;
-
-                case '^':
-                    useBodyAsReleaseDescription = true;
-                    break;
-
-                case '!':
-                    IsBreakingChange = true;
-                    break;
-
-                default:
-                    typeHasOperator = false;
-                    break;
-            }
-
-            if (typeHasOperator)
-            {
-                type = type[..^1];
-            }
+                Original = message,
+                Description = header,
+                Body = body,
+                IsBreakingChange = breakingFooter
+            };
         }
 
-        ICommitMessageType? commitType = null;
+        string operators = match.Groups["operators"].Value;
+        string scope = match.Groups["scope"].Value.Trim();
 
-        if (commitType is null && type is not null)
+        return new CommitMessage
         {
-            commitType = types is { Count: > 0 } ? types.SingleOrDefault(e => e.Key == type) : GetType(type);
-        }
-
-        OriginMessage = message;
-        Type = commitType ?? new DefaultCommitMessageType();
-        Description = description;
-        Body = body;
-        Ignore = Ignore || ignores?.Any(Description.StartsWith) is true;
-
-        if (!string.IsNullOrWhiteSpace(authorName))
-        {
-            authorName = $" [{authorName}]";
-        }
-
-        if (useBodyAsReleaseDescription && body is not null)
-        {
-            ReleaseDescription = body + authorName;
-        }
-        else
-        {
-            ReleaseDescription = Description + authorName;
-
-            if (body is not null)
-            {
-                ReleaseDescription += HtmlBreakLine + body;
-            }
-        }
-
-        if (replaces is not { Count: > 0 })
-        {
-            return;
-        }
-
-        foreach ((string oldValue, string newValue) in replaces)
-        {
-            if (ReleaseDescription.StartsWith(oldValue, StringComparison.InvariantCultureIgnoreCase))
-            {
-                ReleaseDescription = newValue + ReleaseDescription[oldValue.Length..];
-            }
-        }
-    }
-
-    /// <summary>
-    /// A quebra de linha em HTML.
-    /// </summary>
-    private const string HtmlBreakLine = "<br>";
-
-    /// <summary>
-    /// Obtém a mensagem de origem da mensagem de commit.
-    /// </summary>
-    public string OriginMessage { get; }
-
-    /// <summary>
-    /// Obtém o tipo da mensagem de commit.
-    /// </summary>
-    public ICommitMessageType Type { get; }
-
-    /// <summary>
-    /// Obtém a descrição da mensagem de commit.
-    /// </summary>
-    public string Description { get; }
-
-    /// <summary>
-    /// Obtém a descrição de release da mensagem de commit.
-    /// </summary>
-    public string ReleaseDescription { get; }
-
-    /// <summary>
-    /// Obtém o corpo da mensagem de commit.
-    /// </summary>
-    public string? Body { get; }
-
-    /// <summary>
-    /// Obtém um sinalizador indicando se a mensagem de commit traz uma quebra de compatibilidade.
-    /// </summary>
-    public bool IsBreakingChange { get; }
-
-    /// <summary>
-    /// Obtém um sinalizador indicando se a mensagem de commit deve ser ignorada.
-    /// </summary>
-    public bool Ignore { get; }
-
-    /// <summary>
-    /// Obtém a representação do tipo da mensagem de commit especificado.
-    /// </summary>
-    /// <param name="type">O tipo da mensagem de commit.</param>
-    /// <returns>A representação do tipo da mensagem de commit especificado.</returns>
-    private static ICommitMessageType? GetType(string type)
-    {
-        IEnumerable<ICommitMessageType?> types = AssemblyHelper.GetAllClassesWithInterface<ICommitMessageType>();
-
-        return types.SingleOrDefault(e => e?.Key == type);
-    }
-
-    /// <summary>
-    /// Separa a mensagem de commit especificada em tipo, descrição e corpo.
-    /// </summary>
-    /// <param name="message">A mensagem de commit a ser separada.</param>
-    /// <returns>A mensagem de commit separada em tipo, descrição e corpo.</returns>
-    private static (string? Type, string Description, string? Body) SplitMessage(string message)
-    {
-        string[] lines = message.Split("\n");
-        string[] messages = lines[0].Split(": ");
-
-        (string? type, string description) = messages switch
-        {
-            { Length: >= 2 } => (messages[0], messages[1]),
-            _ => (null, messages[0])
+            Original = message,
+            Type = match.Groups["type"].Value.ToLowerInvariant(),
+            Scope = scope.Length > 0 ? scope : null,
+            Description = match.Groups["description"].Value.Trim(),
+            Body = body,
+            IsBreakingChange = operators.Contains('!') || breakingFooter,
+            IsHidden = operators.Contains('#'),
+            UsesBodyAsDescription = operators.Contains('^')
         };
-
-        string? body = lines.Length > 1 ? string.Join(HtmlBreakLine, lines[1..]) : null;
-
-        return (type, description, body);
     }
 
-    /// <inheritdoc/>
-    public override string ToString() => OriginMessage;
+    /// <summary>
+    /// Separa as linhas depois do título em corpo e rodapés.
+    /// </summary>
+    /// <remarks>
+    /// Os rodapés são o último parágrafo quando todas as linhas dele têm a forma <c>Chave: valor</c> do Git (como
+    /// <c>Co-Authored-By</c> e <c>Signed-off-by</c>): eles servem à ferramenta, e não a quem lê as notas.
+    /// </remarks>
+    /// <param name="lines">As linhas depois do título.</param>
+    /// <returns>O corpo e os rodapés.</returns>
+    private static (IReadOnlyList<string> Body, IReadOnlyList<string> Footers) SplitBodyAndFooters(string[] lines)
+    {
+        List<string> remaining = TrimBlankLines(lines);
+        int lastParagraphStart = remaining.FindLastIndex(string.IsNullOrWhiteSpace) + 1;
+        List<string> lastParagraph = remaining[lastParagraphStart..];
+
+        if (lastParagraph.Count == 0 || !lastParagraph.All(line => FooterRegex().IsMatch(line)))
+        {
+            return (remaining, []);
+        }
+
+        return (TrimBlankLines(remaining[..lastParagraphStart]), lastParagraph);
+    }
+
+    /// <summary>
+    /// Tira as linhas em branco do começo e do fim.
+    /// </summary>
+    /// <param name="lines">As linhas.</param>
+    /// <returns>As linhas sem as linhas em branco das pontas, cada uma sem os espaços do fim.</returns>
+    private static List<string> TrimBlankLines(IEnumerable<string> lines)
+    {
+        List<string> result = [.. lines.Select(line => line.TrimEnd())];
+
+        while (result.Count > 0 && result[0].Length == 0)
+        {
+            result.RemoveAt(0);
+        }
+
+        while (result.Count > 0 && result[^1].Length == 0)
+        {
+            result.RemoveAt(result.Count - 1);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// O título no formato <c>tipo(escopo)operadores: descrição</c>.
+    /// </summary>
+    [GeneratedRegex(@"^(?<type>[A-Za-z][A-Za-z0-9-]*)(?:\((?<scope>[^()]*)\))?(?<operators>[!#^]*):\s+(?<description>\S.*)$")]
+    private static partial Regex HeaderRegex();
+
+    /// <summary>
+    /// Uma linha de rodapé do Git: <c>Chave: valor</c> ou <c>Chave #valor</c>.
+    /// </summary>
+    /// <remarks>
+    /// Só valem as chaves com hífen (<c>Co-Authored-By</c>, <c>Signed-off-by</c>, <c>BREAKING-CHANGE</c>),
+    /// <c>BREAKING CHANGE</c> e as referências de issue. Uma chave de uma palavra só, como <c>Nota: ...</c>, é texto
+    /// do corpo, e tirá-la das notas apagaria o que a pessoa escreveu.
+    /// </remarks>
+    [GeneratedRegex(@"^(?:BREAKING CHANGE|[A-Za-z]+(?:-[A-Za-z]+)+|(?i:refs?|fix(?:es)?|close[sd]?|resolve[sd]?))(?:: | #)\S")]
+    private static partial Regex FooterRegex();
+
+    /// <summary>
+    /// O rodapé que marca a quebra de compatibilidade.
+    /// </summary>
+    [GeneratedRegex(@"^BREAKING[ -]CHANGE: ")]
+    private static partial Regex BreakingFooterRegex();
 }

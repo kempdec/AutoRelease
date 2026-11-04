@@ -1,58 +1,71 @@
 {
-  // O token para acesso ao repositório no GitHub.
-  "Token": null,
-  // O repositório que contém os commits no GitHub.
+  // Modelo com todas as opções do Auto Release. Todas são opcionais; copie para a raiz do seu projeto só as que usar.
+  //
+  // O token NÃO vai neste arquivo: ele costuma ir junto para o repositório. Passe o token na variável de ambiente
+  // AutoRelease_Token (no GitHub Actions, AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }}).
+  //
+  // Cada chave pode ficar na raiz, valendo para todos os comandos, ou na seção de um comando, valendo só para ele.
+  // A ordem de precedência é: a linha de comando, a variável de ambiente, a seção do comando, a raiz e o padrão.
+
+  // O repositório no GitHub, como dono/nome. No GitHub Actions, vem sozinho.
   "Repo": null,
-  // O branch do repositório no GitHub.
+  // O branch da release, quando ele não é o do commit em que o GitHub Actions roda.
   "Branch": null,
+  // O commit exato da release. No GitHub Actions, vale o commit que disparou o fluxo.
+  "Commit": null,
 
-  // As configurações do subcomando de criação automática de um release.
   "CreateCommand": {
-    // A versão do release.
+    // A versão da release, quando ela não deve ser calculada pelos commits (como no fluxo disparado por uma tag).
     "Version": null,
-    // O nome do projeto.
+    // O nome do projeto no título da release. Padrão: o nome do repositório.
     "ProjectName": null,
-    // Um sinalizador indicando se o release é um rascunho.
-    "Draft": null,
-    // Um sinalizador indicando se o release é um pre-release.
-    "PreRelease": null,
-    // O tipo de saída da criação automática do release.
-    "OutputType": null,
+    // Cria a release como rascunho.
+    "Draft": false,
+    // Marca a release como pre-release.
+    "PreRelease": false,
+    // O que o comando escreve na saída: Id, UploadUrl, Version, Tag ou HtmlUrl.
+    "OutputType": "Id",
+    // Mostra a release que seria criada, sem criar nada.
+    "DryRun": false,
+    // Não cria a release quando não há nada novo para anunciar (nenhum commit, ou todos ignorados).
+    "SkipEmpty": false,
 
-    // Os tipos das mensagens de commit.
-    "Types": null,
-    // As substituições do início das mensagens de commit.
-    "Replaces": null,
-    // Os inícios das mensagens de commit que serão ignoradas.
-    "Ignores": null,
-    // Um sinalizador indicando se o autor deve ser exibido no final das mensagens de commit.
-    "ShowAuthor": null,
+    // Os tipos dos commits, na ordem das notas, no formato chave=Título. O primeiro sobe a versão minor; os demais, a
+    // patch. Um tipo fora da lista vai para "Outros". Padrão: feat, fix e chore.
+    "Types": [
+      "feat=Novidades",
+      "fix=Correções",
+      "chore=Notas técnicas"
+    ],
+    // As trocas do começo das descrições nas notas. Vale a troca de começo mais longo que casa, uma vez só.
+    "Replaces": {
+      "Adicionar": "Foi adicionado",
+      "Adicionar o ": "Foi adicionado o ",
+      "Adicionar a ": "Foi adicionada a ",
+      "Corrigir": "Foi corrigido"
+    },
+    // Os começos das descrições que ficam fora das notas e da conta da versão.
+    "Ignores": [
+      "Merge"
+    ],
+    // Mostra o nome do autor em cada linha das notas.
+    "ShowAuthor": false,
 
-    // A primeira versão do repositório.
-    "FirstVersion": null,
-    // O prefixo das versões do repositório.
-    "VersionPrefix": null
+    // A versão da primeira release, quando o repositório ainda não tem tag de versão.
+    "FirstVersion": "1.0.0",
+    // O prefixo das tags de versão.
+    "VersionPrefix": "v"
   },
 
-  // As configurações do subcomando de geração automática das notas do release.
-  "NoteCommand": {
-    // A versão do release.
-    "Version": null,
-    // Os tipos das mensagens de commit.
-    "Types": null,
-    // As substituições do início das mensagens de commit.
-    "Replaces": null,
-    // Os inícios das mensagens de commit que serão ignoradas.
-    "Ignores": null,
-    // Um sinalizador indicando se o autor deve ser exibido no final das mensagens de commit.
-    "ShowAuthor": null
-  },
-
-  // As configurações do subcomando de geração automática da versão do release.
-  "VersionCommand": {
-    // A primeira versão do repositório.
-    "FirstVersion": null,
-    // O prefixo das versões do repositório.
-    "VersionPrefix": null
+  // O comando lint lê Types, Replaces e Ignores do CreateCommand quando eles não estão aqui.
+  "LintCommand": {
+    // A descrição precisa começar por uma das trocas de Replaces (como "Adicionar" ou "Corrigir").
+    "RequireLeadingWord": true,
+    // O título precisa terminar em ponto final.
+    "RequirePeriod": false,
+    // O tamanho máximo do título, ou null sem limite.
+    "MaxHeaderLength": null,
+    // Os rodapés que o projeto não aceita, como "Co-Authored-By".
+    "ForbiddenTrailers": []
   }
 }
