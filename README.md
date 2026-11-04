@@ -1,68 +1,44 @@
-
 # Auto Release
 
-Gere automaticamente releases do seu projeto no GitHub usando o Auto Release.
+[![Conferir](https://github.com/kempdec/AutoRelease/actions/workflows/ci.yml/badge.svg)](https://github.com/kempdec/AutoRelease/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/v/AutoRelease)](https://www.nuget.org/packages/AutoRelease)
 
-## Começando
+Gere as releases do seu projeto no GitHub a partir das mensagens de commit: a versão sai dos tipos dos commits
+([SemVer](https://semver.org)), e as notas saem das descrições, agrupadas e escritas para quem lê.
 
-Use o sumário abaixo para escolher como quer aprender a usar o Auto Release.
+```text
+feat: Adicionar a busca de demandas.          →   # Novidades
+fix: Corrigir o filtro que voltava vazio.          - Foi adicionada a busca de demandas.
+                                                  # Correções
+                                                   - Foi corrigido o filtro que voltava vazio.
+```
 
-- [**GitHub Actions**](#github-actions) - Automatize a criação dos seus releases com o CI/CD do GitHub.
-- [**CLI (Interface de Linha de Comando)**](#cli-interface-de-linha-de-comando) - Crie os seus releases a partir do seu terminal.
+O que ele garante:
 
-Depois, veja como escrever as suas mensagens de commit para usar todo o potencial do Auto Release [**clicando aqui**](#escrevendo-commits).
+- **A release sai do commit exato que disparou o fluxo**, e não da ponta do branch no momento em que roda.
+- **Os commits contam a partir da tag da versão anterior**, e não pela data: um commit refeito com data antiga não some.
+- **Quando algo falha, o comando falha**: o código de saída é 1 e a mensagem diz o que houve e o que fazer.
+- **O resultado e as mensagens ficam separados**: `$(autorelease create)` guarda só o resultado.
+- **As mensagens fora da regra são barradas antes**, no commit e na CI, pelo comando `lint`.
 
 ## Índice
 
-- [Auto Release](#auto-release)
-  - [Começando](#começando)
-  - [Índice](#índice)
-  - [GitHub Actions](#github-actions)
-    - [Criando um fluxo de trabalho simples no GitHub Actions](#criando-um-fluxo-de-trabalho-simples-no-github-actions)
-    - [Personalizando o fluxo de trabalho](#personalizando-o-fluxo-de-trabalho)
-  - [CLI (Interface de Linha de Comando)](#cli-interface-de-linha-de-comando)
-    - [Instalação](#instalação)
-  - [Escrevendo commits](#escrevendo-commits)
-  - [Configurações](#configurações)
-    - [Arquivo de configuração](#arquivo-de-configuração)
-    - [Variáveis de ambiente](#variáveis-de-ambiente)
-    - [Propriedades de configuração](#propriedades-de-configuração)
-      - [CreateComand](#createcomand)
-      - [CreateComand e NoteCommand](#createcomand-e-notecommand)
-      - [CreateComand e VersionCommand](#createcomand-e-versioncommand)
-  - [Autores](#autores)
-  - [Licença](#licença)
+- [GitHub Actions](#github-actions)
+- [Linha de comando](#linha-de-comando)
+- [Escrevendo commits](#escrevendo-commits)
+- [Como a versão e as notas são calculadas](#como-a-versão-e-as-notas-são-calculadas)
+- [Configuração](#configuração)
+- [Conferindo as mensagens de commit](#conferindo-as-mensagens-de-commit)
+- [Saída e códigos de saída](#saída-e-códigos-de-saída)
+- [Migrando da versão 1](#migrando-da-versão-1)
+- [Segurança](#segurança)
 
 ## GitHub Actions
 
-Para começar a usar o [Auto Release no GitHub Actions](https://github.com/marketplace/actions/auto-release-action) é muito fácil, siga os passos abaixo e diga adeus a escrever
-releases manualmente.
+Crie o arquivo `.github/workflows/release.yml` no seu repositório:
 
-### Criando um fluxo de trabalho simples no GitHub Actions
-
-Acesse o seu repositório no GitHub e no menu suspenso "**Add file**", vá em "**Create new file**".
-![Botão "Create new file" no GitHub](assets/readme/create-new-file.png)
-
----
-
-Em "**Name your file...**" digite o seguinte: `.github/workflows/main.yml`.
-
-![Campo "Name your file..." no GitHub](assets/readme/name-your-file.png)
-
----
-
-Ficará semelhante a imagem abaixo:
-
-![Campo "Name your file..." com o caminho ".github/workflows/main.yml" no GitHub](assets/readme/name-your-file-main-yml.png)
-
----
-
-Copie o código abaixo e cole no corpo do arquivo no GitHub.
-
-``` yml
-# .github/workflows/main.yml
-
-name: Criar Release
+```yml
+name: Criar release
 
 on:
   push:
@@ -70,349 +46,243 @@ on:
       - main
 
 jobs:
-  create-release:
-    name: Criar Release
+  release:
+    name: Criar release
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      contents: write # Criar a tag e a release; nada além disso.
 
     steps:
-      - name: Criar Release
-        uses: kempdec/autorelease-action@v2
+      - name: Criar release
+        uses: kempdec/autorelease-action@v3
         env:
-          AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }} # Este token é fornecido pelo GitHub Actions, você não precisa criar seu próprio token.
+          AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
----
+A cada push no `main`, o Auto Release lê os commits desde a última tag de versão, calcula a próxima e cria a release no
+commit do push. O repositório e o commit vêm do GitHub Actions; o token é o que o próprio GitHub Actions fornece.
 
-Clique no botão "**Commit changes**".
+Para criar a release quando você publica uma tag de versão, informe a versão da tag:
 
-![Botão "Commit changes" no GitHub](assets/readme/commit-changes-btn.png)
-
----
-
-Escreva a sua mensagem de commit e clique mais uma vez em "**Commit changes**".
-
-![Janela "Commit changes" no GitHub](assets/readme/commit-changes.png)
-
-**Pronto! Isso já é o suficiente para que o Auto Release comece a gerar automaticamente os releases do seu repositório no GitHub. Toda vez que um `push` for feito para o branch `main`, um release será criado.**
-
-Veja como configurar e costumizar o Auto Release para que atenda melhor as suas necessidades e da sua equipe **[clicando aqui](#configurações)**.
-
-### Personalizando o fluxo de trabalho
-
-Caso você queira disparar a ação de criação da release manualmente, troque o conteúdo de `on: push` para `on: workflow_dispatch`.
-
-``` yml
-# .github/workflows/main.yml
-
-name: Criar Release
-
-on:
-  workflow_dispatch:
-
-jobs:
-  create-release:
-    name: Criar Release
-    runs-on: ubuntu-latest
-    permissions: write-all
-
-    steps:
-      - name: Criar Release
-        uses: kempdec/autorelease-action@v2
-        env:
-          AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }} # Este token é fornecido pelo GitHub Actions, você não precisa criar seu próprio token.
-```
-
-Ou se preferir, o release pode ser criado quando você fizer o `push` de uma `tag` de versão para o repositório. Nesse caso troque o conteúdo de `on: push: branches` para `on: push: tags` e adicione a variável de ambiente `AutoRelease_Version`.
-
-``` yml
-# .github/workflows/main.yml
-
-name: Criar Release
-
+```yml
 on:
   push:
     tags:
-      - "v*" # Tags que iniciarem com v, como v1.0.0, v2.3.5-beta.1.
+      - "v*"
 
-jobs:
-  create-release:
-    name: Criar Release
-    runs-on: ubuntu-latest
-    permissions: write-all
-
-    steps:
-      - name: Criar Release
-        uses: kempdec/autorelease-action@v2
+# ...
         env:
-          AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }} # Este token é fornecido pelo GitHub Actions, você não precisa criar seu próprio token.
+          AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }}
           AutoRelease_Version: ${{ github.ref_name }}
 ```
 
-## CLI (Interface de Linha de Comando)
+## Linha de comando
 
-### Instalação
+Instale a ferramenta com o SDK do .NET 10:
 
-Instale a ferramenta a partir do SDK do .NET.
-
-``` powershell
+```sh
 dotnet tool install -g autorelease
 ```
 
-Digite o comando `autorelease --help` em seu Terminal para que seja impresso a ajuda.
+| Comando              | O que faz |
+| -------------------- | --------- |
+| `autorelease create` | Calcula a versão, escreve as notas e cria a release. |
+| `autorelease note`   | Escreve as notas da próxima release, sem criar nada. |
+| `autorelease version`| Calcula a versão da próxima release, sem criar nada. |
+| `autorelease lint`   | Confere as mensagens de commit contra as regras do projeto. |
 
-![Opção "--help" na CLI do Auto Release](assets/readme/cli-help.png)
+Antes de criar a primeira release, veja o que sairia, sem criar nada:
 
-Para imprimir a ajuda de algum comando, informe ele e em seguida a opção `--help`.
+```sh
+export AutoRelease_Token="<seu token>"
+autorelease create --repo kempdec/MeuProjeto --dry-run
+```
 
-Exemplo: `autorelease create --help`.
+```text
+Ensaio: nada foi criado.
+Título: MeuProjeto v1.4.0 (2026-11-04)
+Tag: v1.4.0, no commit 8f2c1a9
+Versão anterior: v1.3.2
+Commits desde ela: 12
 
-![Opção "--help" para o comando "create" na CLI do Auto Release](assets/readme/cli-create-help.png)
+# Novidades
+...
+```
 
-**A CLI também funciona com um arquivo de configuração do Auto Release.** Nos exemplos acima, o arquivo deveria estar em `C:\Users\ceo`, que é o caminho em que o terminal se encontra.
-
-Veja como usar um arquivo de configuração [clicando aqui.](#configurações)
+Use `autorelease <comando> --help` para ver todas as opções de um comando.
 
 ## Escrevendo commits
 
-### Conventional Commits
+O Auto Release lê as mensagens no formato do [Conventional Commits](https://www.conventionalcommits.org):
 
-O Auto Release usa o padrão do [**Conventional Commits**](https://www.conventionalcommits.org) (com poucas diferenças)
-para ler os commits e gerar o release automaticamente.
-
-Ou seja, a mensagem do commit deve ser estruturada da seguinte forma:
-
-> **Obs.: O Auto Release ainda não oferece suporte a escopos, mas em breve será adicionado o recurso.**
-
-``` txt
-<tipo>: <descrição>
+```text
+<tipo>(<escopo opcional>)<operadores opcionais>: <descrição>
 
 [corpo opcional]
 
-[rodapé(s) opcional(is)]
+[rodapés opcionais]
 ```
 
-Os tipos `feat` e `fix` e o operador `!` funcionam como está descrito em [**Conventional Commits**](https://www.conventionalcommits.org), com as seguintes diferenças:
+- O **escopo** aparece em negrito na frente do item: `fix(api): Corrigir a rota.` vira `**api:** Corrigir a rota.`
+- O **corpo** entra no mesmo item, depois da descrição.
+- Os **rodapés do Git** (`Co-Authored-By`, `Signed-off-by`, `Refs #12`) ficam fora das notas.
+- O rodapé **`BREAKING CHANGE:`** marca a quebra de compatibilidade, como o operador `!`.
 
-- Caso a propriedade `Types` (arquivo) ou `types` (CLI) seja especificada, o primeiro tipo terá o funcionamento de `feat`,
-de incrementar a versão `minor` e todos os demais tipos incrementarão a versão `patch`.
-- O texto `BREAKING CHANGE:` não é utilizado como sinalizador para quebra de compatbilidade, somente o operador `!`, mas você pode usar os 2 em conjunto.
-  
-  Exemplo da mensagem de commit:
-  ``` text
-  fix: Corrigir a criação de artigos.
+Os operadores ficam colados ao tipo, antes dos dois-pontos, e podem ser combinados:
 
-  Corrigido um problema em que quando a data de publicação era inferior a data de criação, o artigo não era criado.
+| Operador | Efeito |
+| -------- | ------ |
+| `!`      | Quebra a compatibilidade: sobe a versão `major`. Ex.: `feat!: Remover a rota antiga.` |
+| `#`      | Fica fora das notas e da conta da versão. Ex.: `chore#: Atualizar a CI.` |
+| `^`      | Usa só o corpo nas notas, no lugar da descrição. Ex.: `feat^: Ignorada.` |
 
-  Obs.: Somente de exemplo.
-  ```
+## Como a versão e as notas são calculadas
 
-  As notas geradas serão semelhantes a abaixo:
-  
-  ``` text
-  # My Project v1.0.0 (2024-01-01)
+**A versão anterior** é a maior tag com o prefixo do projeto (`v`, por padrão) que é uma versão semântica. **Os
+commits** são os que o commit da release tem e o da tag não. Sem tag, vale a história inteira e a versão
+`FirstVersion`.
 
-  # Correções
-  
-  - Corrigido um problema em que quando a data de publicação era inferior a data de criação, o artigo não era criado.
-    
-    Obs.: Somente de exemplo.
-  ```
+**O salto** vem dos commits que contam (os ignorados não contam):
 
-### Operadores
+| Commit | Salto |
+| ------ | ----- |
+| Algum com `!` ou `BREAKING CHANGE:` | `major` (1.4.2 → 2.0.0) |
+| Algum do **primeiro tipo** de `Types` (`feat`, por padrão) | `minor` (1.4.2 → 1.5.0) |
+| Qualquer outro | `patch` (1.4.2 → 1.4.3) |
 
-Você pode utilizar operadores para que o Auto Release trate as suas mensagens de commit de maneira diferente.
-Atualmente é possível utilizar somente um operador por vez.
+Depois de uma pre-release (como `2.0.0-beta.1`), a próxima versão é a estável dela (`2.0.0`).
 
-Para utilizar um operador, coloque-o no final do tipo da mensagem de commit e antes do separador : (dois pontos).
+**As notas** têm um grupo por tipo, na ordem de `Types`, com um item por commit, do mais antigo ao mais novo. Um texto
+repetido entra uma vez. O commit de um tipo fora da lista vai para o grupo "Outros", no fim.
 
-Exemplo com o operador `^`:
-``` txt
-feat^: Essa descrição será ignorada.
+## Configuração
 
-Somente esse corpo será adicionado as notas do release.
-```
+Configure pelo arquivo `autorelease.config.json`, na raiz do projeto, ou pelas variáveis de ambiente com o prefixo
+`AutoRelease_`. O [modelo com todas as opções](src/AutoRelease/autorelease.config.json) explica cada uma.
 
-Os operadores disponíveis são:
-
-| **Operador** | **Descrição** |
-| ------------ | ------------- |
-| `!`          | A mensagem de commit traz uma quebra de compatibilidade e a versão `major` deve ser incrementada. |
-| `#`          | A mensagem de commit deve ser ignorada e não deve ser adicionada as notas do release. |
-| `^`          | A mensagem de commit deve ter somente o seu corpo adicionado as notas de release, ou seja, a sua descrição deve ser ignorada. |
-
-## Configurações
-
-### Arquivo de configuração
-
-Uma das maneiras de configurar o Auto Release, é adicionando um arquivo com o nome `autorelease.config.json` na raiz do seu projeto.
-
-> Exemplo: Se o seu projeto está em `D:/MeuProjeto`, é nela que o arquivo deverá ser criado.
-
-**Um modelo atualizado com todas as opções do `autorelease.config.json` pode ser encontrado [clicando aqui](https://github.com/kempdec/AutoRelease/blob/main/src/AutoRelease/autorelease.config.json).**
-
-**Observações:**
-- Todas as propriedades de configuração são **OPCIONAIS**.
-- A configuração abaixo é **apenas um exemplo** e **NÃO deve** ser usada em seu projeto, a menos que entenda o que está fazendo.
-- Caso você esteja utilizando o Auto Release no GitHub Actions, as propriedades `NoteCommand` e `VersionCommand` devem ser ignoradas.
-
-``` jsonc
+```jsonc
 // autorelease.config.json
-
 {
-  // O token para acesso ao repositório no GitHub.
-  "Token": "ghp_1DF8350tVc1Ry0IBuWH3uh8cTRpofs0FY0Iv",
-  // O repositório que contém os commits no GitHub.
-  "Repo": "kempdec/MyRepository",
-  // O branch do repositório no GitHub.
-  "Branch": "main",
-
-  // As configurações do subcomando de criação automática de um release.
   "CreateCommand": {
-    // A versão do release.
-    // No exemplo abaixo, o release seria criado na v1.3.0. O uso dela é recomendado somente de forma dinâmica, como em
-    // uma variável de ambiente definida pelo GitHub Actions.
-    "Version": "v1.3.0",
-    // O nome do projeto.
-    // Ele pode ser utilizado em alguns lugares, como parte do título do release.
-    "ProjectName": "Meu Repositório",
-    // Um sinalizador indicando se o release é um rascunho.
-    "Draft": false,
-    // Um sinalizador indicando se o release é um pre-release.
-    "PreRelease": false,
-    // O tipo de saída da criação automática do release.
-    // Algumas opções são: Id, UploadUrl e Version.
-    "OutputType": "Id",
-
-    // Os tipos das mensagens de commit.
-    "Types": [
-      "feat=Novidades desta versão",
-      "fix=Principais correções desta versão",
-      "chore=Notas técnicas"
-    ],
-    // As substituições do início das mensagens de commit.
+    "ProjectName": "Meu Projeto",
+    "Types": ["feat=Novidades", "fix=Correções", "chore=Notas técnicas"],
     "Replaces": {
       "Adicionar": "Foi adicionado",
-      "Adicionar o ": "Foi adicionado o ",
       "Adicionar a ": "Foi adicionada a ",
-      "Corrigir": "Corrigido um problema em que"
+      "Corrigir": "Foi corrigido"
     },
-    // Os inícios das mensagens de commit que serão ignoradas.
-    "Ignores": [
-      "Refatorar."
-    ],
-
-    // A primeira versão do repositório.
-    "FirstVersion": "0.1.0",
-    // O prefixo das versões do repositório.
-    "VersionPrefix": "v"
-  },
-
-  // As configurações do subcomando de geração automática das notas do release.
-  "NoteCommand": {
-    // Os tipos das mensagens de commit.
-    "Types": [
-      "feat=Novidades desta versão",
-      "fix=Principais correções desta versão"
-    ],
-    // As substituições do início das mensagens de commit.
-    "Replaces": null,
-    // Os inícios das mensagens de commit que serão ignoradas.
-    "Ignores": [
-      "Refatorar."
-    ]
-  },
-
-  // As configurações do subcomando de geração automática da versão do release.
-  "VersionCommand": {
-    // A primeira versão do repositório.
-    "FirstVersion": "0.1.0",
-    // O prefixo das versões do repositório.
-    "VersionPrefix": null
+    "Ignores": ["Merge"]
   }
 }
 ```
 
-### Variáveis de ambiente
+**O token não vai no arquivo**, que costuma ir para o repositório. Passe-o em `AutoRelease_Token`, guardado como
+segredo. Se o Auto Release achar um token no arquivo, ele avisa.
 
-Você pode definir variáveis de ambiente com o prefixo `AutoRelease_` para configurar o Auto Release.
+Cada chave vale na raiz (para todos os comandos) ou na seção de um comando (`CreateCommand`, `NoteCommand`,
+`VersionCommand`, `LintCommand`). `note`, `version` e `lint` também leem a seção `CreateCommand`. A precedência é:
 
-Para configurar o repositório, por exemplo, o nome da variável de ambiente seria `AutoRelease_Repo`.
+1. a opção da linha de comando (`--types`);
+2. a variável de ambiente (`AutoRelease_CreateCommand__Types`, com `__` separando a seção);
+3. a seção do comando no arquivo;
+4. a raiz do arquivo;
+5. o padrão.
 
-``` jsonc
-// Essa variável de ambiente:
-AutoRelease_Repo="kempdec/MyRepository"
+Numa variável de ambiente, uma lista é um texto com os itens separados por espaço, e um item com espaço vai entre
+aspas: `AutoRelease_CreateCommand__Types='feat="Novidades desta versão" fix=Correções'`.
 
-// É equivalente a essa propriedade no arquivo de configuração:
-{
-  "Repo": "kempdec/MyRepository"
-}
+| Chave | Opção | Padrão | O que faz |
+| ----- | ----- | ------ | --------- |
+| `Token` | `--token` | `GITHUB_TOKEN` | O token de acesso ao GitHub. Use a variável de ambiente. |
+| `Repo` | `--repo` | `GITHUB_REPOSITORY` | O repositório, como `dono/nome`. |
+| `Commit` | `--commit` | `GITHUB_SHA` | O commit exato da release. |
+| `Branch` | `--branch` | o branch padrão | O branch da release, quando ele não é o do GitHub Actions. |
+| `Version` | `--version` | calculada | A versão da release, quando ela não deve ser calculada. |
+| `Types` | `--types` | `feat`, `fix`, `chore` | Os tipos, na ordem das notas, como `chave=Título`. O primeiro sobe a `minor`. |
+| `Replaces` | `--replaces` | nenhuma | As trocas do começo das descrições. Vale a de começo mais longo que casa, uma vez. |
+| `Ignores` | `--ignores` | nenhum | Os começos das descrições que ficam fora das notas e da versão. |
+| `ShowAuthor` | `--show-author` | `false` | Mostra o autor em cada item das notas. |
+| `FirstVersion` | `--first-version` | `1.0.0` | A versão da primeira release. |
+| `VersionPrefix` | `--version-prefix` | `v` | O prefixo das tags de versão. |
+| `ProjectName` | `--project-name` | o nome do repositório | O nome do projeto no título da release. |
+| `Draft` | `--draft` | `false` | Cria a release como rascunho. |
+| `PreRelease` | `--pre-release` | `false` | Marca a release como pre-release. |
+| `OutputType` | `--output-type` | `Id` | O que o `create` escreve: `Id`, `UploadUrl`, `Version`, `Tag` ou `HtmlUrl`. |
+| `DryRun` | `--dry-run` | `false` | Mostra a release que seria criada, sem criar nada. |
+| `SkipEmpty` | `--skip-empty` | `false` | Não cria a release quando todos os commits desde a anterior são ignorados. |
+
+Com a variável `GITHUB_API_URL` apontando para o seu GitHub Enterprise Server (o GitHub Actions a preenche sozinho), o
+Auto Release usa esse endereço.
+
+## Conferindo as mensagens de commit
+
+O `lint` confere as mensagens contra as mesmas regras que escrevem as notas: o formato, o tipo dentro de `Types` e o
+começo dentro de `Replaces`. Uma mensagem fora da regra é barrada antes de virar uma nota errada.
+
+```text
+✗ 3f9a2c1 fix: Ajustar o filtro.
+  A descrição começa por "Ajustar", que não está entre os começos do projeto. Comece por um destes: Adicionar, Corrigir.
+1 mensagem está fora das regras do projeto.
 ```
 
-Use `__` (dois `_`) no nome da variável de ambiente para definir uma propriedade de um objeto.
+No commit, pelo gancho `commit-msg` do Git (`.git/hooks/commit-msg`):
 
-``` jsonc
-// Essa variável de ambiente:
-AutoRelease_CreateCommand__Types="feat=\"Novidades\" fix=\"Correções\" chore=\"Notas técnicas\""
-
-// É equivalente a essa propriedade no arquivo de configuração:
-{
-  "CreateCommand": {
-    "Types": [
-        "types=Novidades",
-        "fix=Correções",
-        "chore=Notas técnicas"
-    ]
-  }
-}
+```sh
+#!/bin/sh
+exec autorelease lint --file "$1"
 ```
 
-### Propriedades de configuração
+Na CI, para os commits de um pull request (com `fetch-depth: 0` no checkout):
 
-| **Arquivo** | **CLI**         | **Tipo**  | **Padrão** | **Sumário** |
-| ----------- | --------------- | --------- | ---------- | ----------- |
-| `Token`     | `token`         | `string`  | `null!`    | `[OBRIGATÓRIA NO CLI]`<br>O token para acesso ao repositório no GitHub.<br>Exemplo: `ghp_1DF8350tVc1Ry0IBuWH3uh8cTRpofs0FY0Iv`. |
-| `Repo`      | `repo`          | `string`  | `null!`    | `[OBRIGATÓRIA NO CLI]`<br>O repositório que contém os commits no GitHub.<br>Exemplo: `kempdec/MyRepository`. |
-| `Branch`    | `branch`        | `string?` | `null`     | O branch do repositório no GitHub.<br>Exemplo: `main`. |
+```sh
+autorelease lint --from "$BASE_SHA" --to "$HEAD_SHA"
+```
 
-#### CreateComand
+As regras opcionais ficam na seção `LintCommand`:
 
-| **Arquivo**   | **CLI**         | **Tipo**   | **Padrão** | **Sumário** |
-| ------------- | --------------- | ---------- | ---------- | ----------- |
-| `Version`     | `version`       | `string?`  | `null`     | A versão do release [**(SemVer 2.0)**](https://semver.org).<br>Quando especificada, a versão do release não será gerada automaticamente. O uso dessa propriedade é recomendado somente de forma dinâmica, como em uma variável de ambiente definida através do GitHub Actions.<br>Exemplo: `1.3.0`. |
-| `ProjectName` | `project-name`  | `string?`  | `null`     | O nome do projeto.<br>Ele pode ser utilizado em alguns lugares, como parte do título do release.<br>Exemplo: `Meu Repositório`. |
-| `Draft`       | `draft`         | `boolean`  | `false`    | Um sinalizador indicando se o release é um rascunho.<br>Exemplo: `false`. |
-| `PreRelease`  | `pre-release`   | `boolean`  | `false`    | Um sinalizador indicando se o release é um pre-release.<br>Exemplo: `false`. |
-| `OutputType`  | `output-type`   | `string`   | `Id`       | O tipo de saída da criação automática do release.<br>Os valores aceitos são: `Id`, `UploadUrl` ou `Version` |
+| Chave | Padrão | O que faz |
+| ----- | ------ | --------- |
+| `RequireLeadingWord` | `true` | A descrição começa por uma das trocas de `Replaces` (quando há trocas). |
+| `RequirePeriod` | `false` | O título termina em ponto final. |
+| `MaxHeaderLength` | sem limite | O tamanho máximo do título. |
+| `ForbiddenTrailers` | nenhum | Os rodapés recusados, como `Co-Authored-By`. |
 
-#### NoteCommand
+Sem `Types`, valem os tipos do Conventional Commits. As mensagens que o Git escreve (`Merge`, `Revert`, `fixup!`) e as
+que começam por um item de `Ignores` não passam pela conferência.
 
-| **Arquivo**   | **CLI**         | **Tipo**   | **Padrão** | **Sumário** |
-| ------------- | --------------- | ---------- | ---------- | ----------- |
-| `Version`     | `version`       | `string?`  | `null`     | A versão do release [**(SemVer 2.0)**](https://semver.org).<br>Quando especificado, as notas do release serão geradas com base nas mensagens de commit desde a versão anterior da versão especificada.<br>Exemplo: `1.3.0`. |
+## Saída e códigos de saída
 
-#### CreateComand e NoteCommand
+- **A saída padrão** recebe só o resultado: a versão, as notas ou o que `OutputType` pede.
+- **A saída de erros** recebe os avisos e os erros, em duas partes: o que houve e o que fazer.
 
-| **Arquivo**   | **CLI**         | **Tipo**   | **Padrão** | **Sumário** |
-| ------------- | --------------- | ---------- | ---------- | ----------- |
-| `Version`     | `version`       | `string?`  | `null`     | A versão do release [**(SemVer 2.0)**](https://semver.org).<br>Quando especificada, a versão do release não será gerada automaticamente. O uso dessa propriedade é recomendado somente de forma dinâmica, como em uma variável de ambiente definida através do GitHub Actions.<br>Exemplo: `1.3.0`. |
-| `Types`       | `types`         | `string[]` | `null`     | Os tipos das mensagens de commit.<br><br>Exemplo arquivo:<br>`["feat=Novidades", "fix=Correções", "chore=Notas técnicas"]`.<br><br>Exemplo CLI:<br>`feat="Novidades" fix="Correções" chore="Notas técnicas"`.<br><br>**A ordem dos tipos definirá também a ordem que são escritos nas notas do release.** Neste exemplo, as `Novidades` serão listadas primeiro. |
-| `Replaces`    | `replaces`      | `object`   | `null`     | As substituições do início das mensagens de commit.<br><br>Exemplo arquivo:<br>`{"Adicionar a ": "Foi adicionada a ", "Corrigir": "Foi corrigido"}`.<br><br>Exemplo CLI:<br>`"Adicionar a "="Foi adicionada a " "Corrigir"="Foi corrigido"`.<br><br>Usando a seguinte mensagem de commit como exemplo:<br>`feat: Adicionar a página de cadastro de usuários.`<br><br>Na geração das notas do release, ela seria substituída por:<br>`Foi adicionada a página de cadastro de usuários.` |
-| `Ignores`     | `ignores`       | `string[]` | `null`     | Os inícios das mensagens de commit que serão ignoradas.<br><br>Exemplo arquivo:<br>`["Refatorar.", "Atualizar a versão"]`.<br><br>Exemplo CLI:<br>`"Refatorar" "Atualizar a versão"`.<br><br>Usando a seguinte mensagem de commit como exemplo:<br>`chore: Atualizar a versão do pacote.`<br><br>Ela seria ignorada, por começar com `Atualizar a versão`.<br><br>**Você também pode ignorar uma mensagem de commit usando o operador `#`.**<br><br>No exemplo abaixo, a mensagem de commit será ignorada, independente de estar ou não em `Ignores`:<br>`chore#: Atualizar a versão do pacote.` |
-| `ShowAuthor`  | `show-author`   | `boolean`  | `false`    | Um sinalizador indicando se o autor deve ser exibido no final das mensagens de commit.<br>Exemplo: `false`. |
+| Código | Quando |
+| ------ | ------ |
+| `0` | Deu certo, inclusive quando `SkipEmpty` não criou a release por não haver nada novo. |
+| `1` | Algo falhou: o token foi recusado, o repositório não existe, a release já existe, uma mensagem está fora da regra. |
 
-#### CreateComand e VersionCommand
+## Migrando da versão 1
 
-| **Arquivo**     | **CLI**          | **Tipo**   | **Padrão** | **Sumário** |
-| --------------- | ---------------- | ---------- | ---------- | ----------- |
-| `FirstVersion`  | `first-version`  | `string`   | `1.0.0`    | A primeira versão do repositório [**(SemVer 2.0)**](https://semver.org).<br>Essa propriedade é utilizada na criação do primeiro release.<br>Exemplo: `0.1.0`. |
-| `VersionPrefix` | `version-prefix` | `string`   | `v`        | O prefixo das versões do repositório.<br>Exemplo: `v`. |
+A versão 2 roda no .NET 10 e é usada pela `kempdec/autorelease-action@v3`. A `@v2` continua instalando a versão 0, sem
+mudar nada para quem a usa. A configuração da versão 1 continua valendo, com estas diferenças:
+
+- A release sai do commit que disparou o fluxo (`GITHUB_SHA`), e não da ponta do branch.
+- Os commits contam a partir da tag da versão anterior, e não da data da última release.
+- O comando sai com o código 1 quando falha. Antes, ele saía com 0, e o fluxo passava como se tivesse dado certo.
+- O primeiro tipo de `Types` sobe a `minor`, como esta documentação sempre disse; antes, só `feat` subia.
+- Os commits ignorados (`#` e `Ignores`) não contam para a versão.
+- As trocas de `Replaces` valem pela de começo mais longo, e não pela ordem no arquivo.
+- A descrição não é mais cortada no segundo `: `, e os rodapés do Git ficam fora das notas.
+- A tag anterior precisa ter o prefixo de `VersionPrefix`.
+
+## Segurança
+
+Para relatar uma vulnerabilidade, siga a [política de segurança](SECURITY.md), e não abra uma issue pública.
 
 ## Autores
 
-- [KempDec](https://kempdec.com) - Mantedora do projeto de código aberto.
-- [Vinícius Lima](https://github.com/viniciusxdl) - Desenvolvedor .NET C#.
+- [KempDec](https://kempdec.com), mantenedora do projeto de código aberto.
+- [Vinícius Lima](https://github.com/viniciusxdl).
 
 ## Licença
 
-[MIT](https://github.com/kempdec/AutoRelease/blob/main/LICENSE.txt)
+[MIT](LICENSE.txt)
