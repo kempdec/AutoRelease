@@ -1,0 +1,6 @@
+feat: Adicionar as rotinas do Claude Code na API, chamadas quando chega trabalho para alguém da equipe.
+feat: Adicionar a tela das rotinas do Claude Code e o aviso da rotina parada, na web e no aplicativo.
+chore#: Adicionar o roteiro da prova das rotinas do Claude Code, com o Claude de mentira.
+docs#: Adicionar a decisão das rotinas do Claude Code, as pendências do desenho e o guia da implantação.
+docs#: Adicionar as rotinas do Claude Code às novidades da próxima versão.
+Merge branch 'develop' into main
