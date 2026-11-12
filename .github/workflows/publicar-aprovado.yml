@@ -1,0 +1,87 @@
+name: Publicar aprovado
+
+# Leva à main o pedido de aprovação que o dono aprovou no KempDec Studio, sem ninguém no PC. É o mesmo workflow dos
+# produtos da KempDec (PLANO-PUBLICACAO.md do Studio); o script é o tools/publicar-aprovado.mjs do Studio, copiado igual
+# em .github/scripts/. De 5 em 5 minutos, pergunta ao Studio, com a chave de publicação deste repositório (o segredo
+# STUDIO_CHAVE_DE_PUBLICACAO), pelos pedidos aprovados dele; junta na main o commit exato do pedido, empurra e dispara o
+# publish.yml (o push com o GITHUB_TOKEN não dispara outros workflows); nas execuções seguintes, marca o pedido como
+# feito, ou escreve no pedido que falhou. Roda na máquina do GitHub: o repositório é público, e runner próprio em
+# repositório público deixaria código de fora rodar numa máquina da KempDec. Sem a variável PUBLICAR_APROVADO = true, a
+# execução é pulada.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+
+  workflow_dispatch:
+    inputs:
+      ensaio:
+        description: "ensaio: Diz o que subiria, sem juntar, empurrar, disparar nem marcar nada."
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: publicar-aprovado
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publicar:
+    name: Publicar o pedido aprovado
+    if: ${{ vars.PUBLICAR_APROVADO == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: write
+    env:
+      STUDIO_URL: ${{ vars.STUDIO_URL || 'https://studio.kempdec.com' }}
+      STUDIO_CHAVE_DE_PUBLICACAO: ${{ secrets.STUDIO_CHAVE_DE_PUBLICACAO }}
+
+    steps:
+      - name: Perguntar ao Studio
+        id: pergunta
+        run: |
+          if [ -z "$STUDIO_CHAVE_DE_PUBLICACAO" ]; then
+            echo "::notice::Sem o segredo STUDIO_CHAVE_DE_PUBLICACAO: nada a perguntar. Crie a chave em Você › Equipe › Chaves de publicação, no Studio."
+            echo "tem=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! corpo=$(curl -fsS --max-time 30 -H "Authorization: Bearer $STUDIO_CHAVE_DE_PUBLICACAO" -H 'Accept: application/json' "$STUDIO_URL/api/publicacao/aprovacoes"); then
+            echo "::warning::O Studio não respondeu a pergunta. Tenta de novo na próxima execução."
+            echo "tem=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$corpo" = "[]" ]; then
+            echo "Nenhum pedido aprovado para este repositório."
+            echo "tem=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "tem=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Obter a main
+        if: ${{ steps.pergunta.outputs.tem == 'true' }}
+        uses: actions/checkout@v4
+        with:
+          ref: refs/heads/main
+          fetch-depth: 0
+
+      - name: Preparar o Node
+        if: ${{ steps.pergunta.outputs.tem == 'true' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Publicar
+        if: ${{ steps.pergunta.outputs.tem == 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLICACOES: ${{ vars.PUBLICACOES || 'publish.yml' }}
+          STUDIO_APROVADORES: ${{ vars.STUDIO_APROVADORES }}
+          ENSAIO: ${{ inputs.ensaio && 'true' || 'false' }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          node .github/scripts/publicar-aprovado.mjs
