@@ -10,64 +10,68 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "version: A vers�o do release a ser criado."
+        description: "A versão da release, quando ela não deve ser calculada pelos commits (como 2.0.0)."
         required: false
 
-      branch:
-        description: "branch: O branch do reposit�rio do release a ser criado."
-        required: false
+permissions:
+  contents: read
 
-      pre-release:
-        description: "pre-release: Um sinalizador indicando se o release � um pre-release."
-        type: boolean
-        required: false
+concurrency:
+  group: publicar
+  cancel-in-progress: false
 
 jobs:
-  release:
-    name: Criar release
+  publicar:
+    name: Testar, publicar o pacote e criar a release
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      # Criar a tag e a release.
+      contents: write
+      # Publicar o pacote no GitHub Packages.
+      packages: write
 
-    outputs:
-      version: ${{ steps.release.outputs.output }}
+    env:
+      TOOL: src/AutoRelease/bin/Release/net10.0/KempDec.AutoRelease.dll
+      AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }}
+      AutoRelease_Version: ${{ inputs.version }}
 
     steps:
-      - name: Criar release
-        id: release
-        uses: kempdec/autorelease-action@v2
-        env:
-          AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }}
-          AutoRelease_Branch: ${{ github.event.inputs.branch }}
-          AutoRelease_CreateCommand__Version: ${{ github.event.inputs.version }}
-          AutoRelease_CreateCommand__PreRelease: ${{ github.event.inputs.pre-release }}
-          AutoRelease_CreateCommand__OutputType: "Version"
-
-  publish:
-    name: Publicar pacote
-    needs: release
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout do reposit�rio
+      - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      - name: Configurar .NET
+      - name: Configurar o .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          global-json-file: global.json
 
-      - name: Restaurar depend�ncias
-        run: dotnet restore
-
-      - name: Gerar pacote
-        run: dotnet pack -p:PackageVersion=${{ needs.release.outputs.version }}
-
-      - name: Carregar o pacote no NuGet
+      - name: Compilar e testar
         run: |
-          cd published/
-          dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+          dotnet build --configuration Release
+          dotnet test --no-build --configuration Release
 
-      - name: Carregar o pacote no GitHub
+      # A própria ferramenta, compilada deste commit, calcula a versão e cria a release do commit que disparou o
+      # fluxo (GITHUB_SHA), e não da ponta do branch no momento em que roda.
+      # A atribuição separada faz o passo falhar quando o cálculo falha: dentro do echo, o código de saída se perderia.
+      - name: Calcular a versão
+        id: version
         run: |
-          cd published/
-          dotnet nuget push *.nupkg --api-key ${{ secrets.PACKAGE_TOKEN }} --source "https://nuget.pkg.github.com/kempdec/index.json" --skip-duplicate
+          version="$(dotnet "$TOOL" version)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Gerar o pacote
+        run: dotnet pack src/AutoRelease --configuration Release -p:Version=${{ steps.version.outputs.version }}
+
+      # O pacote sai antes da release: se a release falhar, rodar de novo cria a mesma versão, e o --skip-duplicate
+      # pula o pacote que já subiu. Na ordem contrária, uma falha no envio deixava uma release sem pacote.
+      - name: Publicar o pacote no NuGet
+        run: >-
+          dotnet nuget push "published/*.nupkg" --api-key ${{ secrets.NUGET_TOKEN }}
+          --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Publicar o pacote no GitHub Packages
+        run: >-
+          dotnet nuget push "published/*.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }}
+          --source https://nuget.pkg.github.com/kempdec/index.json --skip-duplicate
+
+      - name: Criar a release
+        run: dotnet "$TOOL" create --version ${{ steps.version.outputs.version }} --output-type HtmlUrl

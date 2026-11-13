@@ -1,0 +1,69 @@
+chore#: Corrigir a subida no Linux, que pedia a imagem pela versão do release.
+Merge pull request #2 from kempdec/develop
+chore#: Atualizar o guia da implantação com o Live já na máquina Linux.
+docs#: Adicionar o plano do conector do Studio para o Claude, com o contrato antes do código.
+feat: Adicionar os tokens pessoais e o servidor MCP na API, para o Claude trabalhar nas demandas em nome de cada pessoa.
+docs#: Atualizar o plano do conector e as decisões com as respostas do dono e a fase 1 feita.
+chore#: Corrigir a conferência das palavras de outro idioma, que contava os nomes das ferramentas do MCP.
+fix: Corrigir um problema em que a nova demanda demorava a abrir com a rede lenta.
+chore#: Atualizar o branch das telas com a API do conector.
+fix: Corrigir a busca do MCP com apóstrofo, o texto com caractere partido e o encerramento lido do cache.
+docs#: Atualizar as decisões com a rodada de segurança do conector.
+feat: Adicionar o Acesso pelo Claude em Sua conta, para criar e revogar os tokens que deixam o Claude trabalhar em seu nome.
+fix#: Corrigir o Esc da pergunta de revogar o token, que só desistia com o foco no Revogar.
+docs#: Atualizar a prova com o caminho de ter o cartão da versão depois de semear.
+Merge branch 'conector-api' into conector-telas
+fix#: Corrigir o gancho do push, que deixava sair sem conferência o push feito com HEAD.
+docs#: Adicionar as novidades da próxima versão, com o Acesso pelo Claude.
+chore#: Corrigir o teste das novidades, que supunha toda versão nova subindo o número do meio.
+fix#: Corrigir um problema em que o token pessoal criado durante a troca da senha sobrevivia a ela.
+fix: Corrigir um problema em que tocar no aviso do celular no Android, com o aplicativo fechado ou em segundo plano, não abria o Studio.
+fix: Corrigir um problema em que o link de nova senha continuava valendo depois de quem o gerou ser desativado ou rebaixado.
+fix#: Corrigir o link do convite, que ia em claro para o registro da API ao abrir a tela de criar o acesso.
+chore#: Adicionar a prova no PostgreSQL de verdade de que as criações juntas de tokens pessoais param em dez.
+docs#: Adicionar o registro da rodada 20 de bugs e vulnerabilidades da API.
+chore#: Atualizar o Fastify, o fast-uri e o Vite, que tinham vulnerabilidades conhecidas.
+fix#: Corrigir o Backup no Linux, que rodava na máquina do Live o código do develop, antes da conferência do Live.
+fix#: Corrigir os workflows que colavam no script a versão e o que vem do botão, sem permissões mínimas e com a ação de terceiros por etiqueta.
+chore#: Adicionar a auditoria das dependências ao portão do Live e todo dia, com o aviso no repositório.
+fix#: Corrigir a pasta do Studio nas máquinas Linux, aberta aos outros usuários da máquina, e o registro da API sem limite no disco.
+fix: Corrigir um problema em que o celular continuava recebendo os avisos de quem saiu com a rede ruim ou sem manter conectado.
+fix#: Corrigir o contêiner da API, que rodava com as capacidades padrão do Docker e podia subir para root por um programa setuid.
+fix: Corrigir um problema em que colar uma imagem da nuvem ou muito grande travava o aplicativo no Android.
+docs#: Atualizar o CONTINUAR com a rodada 22 de bugs e vulnerabilidades do aplicativo.
+docs#: Atualizar o CLAUDE.md e o guia da implantação com o Studio no ar em contêiner nas máquinas Linux.
+fix#: Corrigir a confiança no proxy das máquinas Linux, que supunha a rede do Docker em 172.16.0.0/12 e podia juntar a equipe inteira num limite de entradas só.
+refactor#: Corrigir o resumo das saídas pendentes, que dizia que o registro do Firebase ficava preso.
+fix#: Corrigir o registro da API, que escrevia num erro do banco os valores da consulta, com o e-mail e o resumo da senha.
+fix: Corrigir um problema em que tocar no aviso do celular com o aplicativo fechado não abria nada no Android.
+chore#: Adicionar a prova de que o Sair mandado de novo com o token de antes não derruba a sessão nova.
+docs#: Atualizar o registro da rodada 20 com o aviso do Android e o Sair guardado do aplicativo.
+fix: Corrigir um problema em que o voltar do navegador e o aviso tocado fechavam a camada aberta sem perguntar, e o token que aparece uma vez sumia.
+fix: Corrigir um problema em que o aviso do token no "ver como" oferecia Ver os tokens, que levava a uma Sua conta sem eles.
+fix: Corrigir a cópia do token pelo menu da seleção, que ia sem a marca de sensível, e o foco perdido depois de criá-lo.
+fix: Corrigir um problema em que o Sair da web com a rede ruim deixava a sessão valendo no servidor até vencer.
+fix#: Corrigir os roteiros da prova que deixaram de casar com as Mensagens desde o acesso=1 e não provocavam mais a falha.
+docs#: Atualizar o CONTINUAR.md com a rodada 23, do servidor e das dependências.
+docs#: Atualizar a lista de conferência e o registro com a rodada 21 de bugs e vulnerabilidades.
+Merge branch 'rodada-23' into integra-rodadas
+Merge branch 'rodada-21' into integra-rodadas
+fix: Corrigir um problema em que o aviso do token que caiu pela troca da senha o mostrava como se ainda valesse.
+fix: Corrigir um problema em que o nome do token com emoji enchia o campo do aplicativo e não deixava criar o token.
+docs#: Atualizar o registro da rodada 20 com o aviso do token caído e o nome contado como se lê.
+Merge branch 'rodada-20' into integra-rodadas
+fix: Corrigir um problema em que o endereço assinado de um anexo ia inteiro para o registro da API.
+fix: Corrigir um problema em que o Ctrl+C de um teclado copiava o token do aplicativo sem a marca de sensível e não contava como copiado.
+fix: Corrigir um problema em que a falha das vigias e da subida escrevia no registro os valores da consulta ao banco.
+fix: Corrigir um problema em que copiar à mão um pedaço do link do convite contava como copiado e o Concluir fechava sem perguntar.
+fix: Corrigir um problema em que, criado o convite ou o link de nova senha, o foco ia para trás do véu e o leitor de tela não ouvia o que nasceu.
+fix: Corrigir um problema em que o campo do nome do token na web cortava o nome com emoji antes dos 60 que o aplicativo aceita.
+fix: Corrigir um problema em que o leitor de tela do aplicativo não ouvia que o convite ou o link de nova senha nasceu, e a ficha mostrava o link diferente da web.
+fix: Corrigir um problema em que quem entrava com a senha de antes no meio da troca da senha continuava com a sessão depois dela.
+fix: Corrigir um problema em que, depois de uma falha no envio, o Tab saía da janela aberta e andava pela página atrás do véu.
+fix: Corrigir um problema em que a troca da senha pedida por uma sessão que caiu no meio dela tomava a conta da dona.
+docs#: Atualizar o registro da rodada 24 e o guia da implantação sobre o que roda na máquina do Live.
+fix: Corrigir um problema em que, criado o acesso pelo convite, o voltar do navegador levava de volta ao convite já usado.
+docs#: Atualizar a lista de conferência e o registro com a rodada 24, das telas e do aplicativo.
+Merge branch 'rodada-24b' into integra-rodadas
+fix: Corrigir um problema em que o link do convite aberto na página de criar o acesso ia inteiro para o registro da API.
+Merge branch 'develop' into main

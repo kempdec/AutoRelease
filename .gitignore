@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Os pacotes gerados pelo dotnet pack.
+published/
+
+# O ignore do Visual Studio acima tira as pastas "Releases" (saída de compilação), e o código do Auto Release tem uma.
+!src/AutoRelease/Releases/
+!tests/AutoRelease.Tests/Releases/

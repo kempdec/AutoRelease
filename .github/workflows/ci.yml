@@ -1,0 +1,52 @@
+name: Conferir
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  conferir:
+    name: Compilar, testar e conferir os commits
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+        with:
+          # O lint lê os commits do push ou do pull request pelo Git, então precisa da história.
+          fetch-depth: 0
+
+      - name: Configurar o .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restaurar as dependências
+        run: dotnet restore
+
+      - name: Compilar
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Testar
+        run: dotnet test --no-build --configuration Release
+
+      - name: Gerar o pacote
+        run: dotnet pack src/AutoRelease --no-build --configuration Release
+
+      - name: Conferir as mensagens dos commits do pull request
+        if: github.event_name == 'pull_request'
+        run: >-
+          dotnet src/AutoRelease/bin/Release/net10.0/KempDec.AutoRelease.dll lint
+          --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
+
+      - name: Conferir as mensagens dos commits do push
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        run: >-
+          dotnet src/AutoRelease/bin/Release/net10.0/KempDec.AutoRelease.dll lint
+          --from ${{ github.event.before }} --to ${{ github.sha }}
