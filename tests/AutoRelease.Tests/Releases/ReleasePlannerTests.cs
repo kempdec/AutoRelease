@@ -117,4 +117,158 @@ public sealed class ReleasePlannerTests
 
         Assert.Equal("v1.10.0", previous?.Name);
     }
+
+    private static async Task<ReleasePlan> PlanAsync(FakeReleaseRepository repository, string? label = null,
+        string? version = null) =>
+        await new ReleasePlanner(repository).PlanAsync(
+            new ReleasePlanRequest
+            {
+                PreReleaseLabel = label,
+                Version = version is null ? null : SemVersion.Parse(version)
+            },
+            TestContext.Current.CancellationToken);
+
+    [Fact]
+    public async Task A_primeira_beta_e_a_proxima_versao_com_o_numero_1_e_as_notas_desde_a_final()
+    {
+        var repository = new FakeReleaseRepository();
+
+        repository.Commit("feat: Um.");
+        repository.Tag("v1.4.0");
+        repository.Commit("feat: Adicionar a busca.");
+
+        ReleasePlan plan = await PlanAsync(repository, "beta");
+
+        Assert.Equal("v1.5.0-beta.1", plan.TagName);
+        Assert.True(plan.Version.IsPrerelease);
+        Assert.Equal("v1.4.0", plan.PreviousTag?.Name);
+        Assert.Equal("# Novidades\n\n- Adicionar a busca.\n", plan.Notes);
+    }
+
+    [Fact]
+    public async Task A_beta_seguinte_sobe_o_numero_e_leva_so_as_notas_desde_a_beta_anterior()
+    {
+        var repository = new FakeReleaseRepository();
+
+        repository.Commit("feat: Um.");
+        repository.Tag("v1.4.0");
+        repository.Commit("feat: Adicionar a busca.");
+        repository.Tag("v1.5.0-beta.1");
+        repository.Commit("fix: Corrigir a busca.");
+
+        ReleasePlan plan = await PlanAsync(repository, "beta");
+
+        Assert.Equal("v1.5.0-beta.2", plan.TagName);
+        Assert.Equal("v1.5.0-beta.1", plan.PreviousTag?.Name);
+        Assert.Single(plan.Commits);
+        Assert.Equal("# Correções\n\n- Corrigir a busca.\n", plan.Notes);
+    }
+
+    [Fact]
+    public async Task A_versao_final_depois_das_betas_leva_as_notas_desde_a_ultima_final()
+    {
+        var repository = new FakeReleaseRepository();
+
+        repository.Commit("feat: Um.");
+        repository.Tag("v1.4.0");
+        repository.Commit("feat: Adicionar a busca.");
+        repository.Tag("v1.5.0-beta.1");
+        repository.Commit("fix: Corrigir a busca.");
+        repository.Tag("v1.5.0-beta.2");
+        repository.Commit("fix: Corrigir o filtro.");
+
+        ReleasePlan plan = await PlanAsync(repository);
+
+        Assert.Equal("v1.5.0", plan.TagName);
+        Assert.Equal("v1.4.0", plan.PreviousTag?.Name);
+        Assert.Equal(3, plan.Commits.Count);
+        Assert.Equal(
+            "# Novidades\n\n- Adicionar a busca.\n\n# Correções\n\n- Corrigir a busca.\n- Corrigir o filtro.\n",
+            plan.Notes);
+    }
+
+    [Fact]
+    public async Task A_versao_final_informada_tambem_leva_as_notas_desde_a_ultima_final()
+    {
+        var repository = new FakeReleaseRepository();
+
+        repository.Commit("feat: Um.");
+        repository.Tag("v1.4.0");
+        repository.Commit("feat: Adicionar a busca.");
+        repository.Tag("v1.5.0-beta.1");
+        repository.Commit("fix: Corrigir a busca.");
+
+        ReleasePlan plan = await PlanAsync(repository, version: "1.5.0");
+
+        Assert.Equal("v1.4.0", plan.PreviousTag?.Name);
+        Assert.Equal(2, plan.Commits.Count);
+    }
+
+    [Fact]
+    public async Task A_beta_nao_faz_a_final_saltar_mais_uma_versao()
+    {
+        var repository = new FakeReleaseRepository();
+
+        repository.Commit("feat: Um.");
+        repository.Tag("v1.4.0");
+        repository.Commit("feat: Adicionar a busca.");
+        repository.Tag("v1.5.0-beta.1");
+        repository.Commit("feat: Adicionar o filtro.");
+
+        Assert.Equal("v1.5.0-beta.2", (await PlanAsync(repository, "beta")).TagName);
+        Assert.Equal("v1.5.0", (await PlanAsync(repository)).TagName);
+    }
+
+    [Fact]
+    public async Task A_final_nao_fica_abaixo_da_versao_que_a_pre_release_anunciou()
+    {
+        var repository = new FakeReleaseRepository();
+
+        repository.Commit("feat: Um.");
+        repository.Tag("v1.4.0");
+        repository.Commit("fix: Corrigir a busca.");
+        repository.Tag("v2.0.0-beta.1");
+        repository.Commit("fix: Corrigir o filtro.");
+
+        ReleasePlan plan = await PlanAsync(repository);
+
+        Assert.Equal("v2.0.0", plan.TagName);
+        Assert.Equal("v1.4.0", plan.PreviousTag?.Name);
+    }
+
+    [Fact]
+    public async Task Cada_rotulo_tem_a_sua_contagem_e_a_versao_informada_ganha_o_rotulo()
+    {
+        var repository = new FakeReleaseRepository();
+
+        repository.Commit("feat: Um.");
+        repository.Tag("v1.4.0");
+        repository.Commit("feat: Adicionar a busca.");
+        repository.Tag("v1.5.0-beta.1");
+        repository.Tag("v1.5.0-beta.2");
+        repository.Commit("fix: Corrigir a busca.");
+
+        Assert.Equal("v1.5.0-rc.1", (await PlanAsync(repository, "rc")).TagName);
+        Assert.Equal("v2.0.0-beta.1", (await PlanAsync(repository, "beta", "2.0.0")).TagName);
+    }
+
+    [Fact]
+    public async Task Depois_da_final_a_beta_seguinte_parte_dela()
+    {
+        var repository = new FakeReleaseRepository();
+
+        repository.Commit("feat: Um.");
+        repository.Tag("v1.4.0");
+        repository.Commit("feat: Adicionar a busca.");
+        repository.Tag("v1.5.0-beta.1");
+        repository.Commit("fix: Corrigir a busca.");
+        repository.Tag("v1.5.0");
+        repository.Commit("fix: Corrigir o filtro.");
+
+        ReleasePlan plan = await PlanAsync(repository, "beta");
+
+        Assert.Equal("v1.5.1-beta.1", plan.TagName);
+        Assert.Equal("v1.5.0", plan.PreviousTag?.Name);
+        Assert.Single(plan.Commits);
+    }
 }

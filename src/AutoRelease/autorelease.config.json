@@ -23,6 +23,10 @@
     "Draft": false,
     // Marca a release como pre-release.
     "PreRelease": false,
+    // Gera a versão de teste com este rótulo, como "beta": a próxima versão com o número seguinte (1.5.0-beta.1,
+    // depois 1.5.0-beta.2), marcada como pre-release, com as notas desde a tag anterior. Sem ele, a versão é final, e
+    // as notas vêm desde a última versão final, com tudo o que veio nas pre-releases.
+    "PreReleaseLabel": null,
     // O que o comando escreve na saída: Id, UploadUrl, Version, Tag ou HtmlUrl.
     "OutputType": "Id",
     // Mostra a release que seria criada, sem criar nada.

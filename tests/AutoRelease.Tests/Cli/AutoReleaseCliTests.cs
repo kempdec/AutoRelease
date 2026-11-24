@@ -296,6 +296,66 @@ public sealed class AutoReleaseCliTests : IDisposable
         Assert.StartsWith("Erro: Algo inesperado aconteceu", Stderr, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task Create_com_o_rotulo_beta_cria_a_pre_release_com_o_numero_seguinte()
+    {
+        _repository.Commit("feat: Um.");
+        _repository.Tag("v1.4.0");
+        _repository.Commit("feat: Adicionar a busca.");
+        _repository.Tag("v1.5.0-beta.1");
+        _repository.Commit("fix: Corrigir a busca.");
+
+        Assert.Equal(0, await RunAsync("create", "--pre-release-label", "beta", "--output-type", "Tag"));
+        Assert.Equal("v1.5.0-beta.2\n", Stdout);
+
+        var created = Assert.Single(_repository.Created);
+
+        Assert.True(created.Prerelease);
+        Assert.Equal("Exemplo v1.5.0-beta.2 (2026-11-04)", created.Name);
+        Assert.Equal("# Correções\n\n- Corrigir a busca.\n", created.Body);
+    }
+
+    [Fact]
+    public async Task O_rotulo_vem_da_variavel_de_ambiente_e_vale_para_o_version()
+    {
+        _repository.Commit("feat: Um.");
+        _repository.Tag("v1.4.0");
+        _repository.Commit("feat: Adicionar a busca.");
+        _environment["AutoRelease_PreReleaseLabel"] = "beta";
+
+        Assert.Equal(0, await RunAsync("version"));
+        Assert.Equal("1.5.0-beta.1\n", Stdout);
+    }
+
+    [Fact]
+    public async Task Create_sem_o_rotulo_depois_das_betas_cria_a_final_com_as_notas_desde_a_ultima_final()
+    {
+        _repository.Commit("feat: Um.");
+        _repository.Tag("v1.4.0");
+        _repository.Commit("feat: Adicionar a busca.");
+        _repository.Tag("v1.5.0-beta.1");
+        _repository.Commit("fix: Corrigir a busca.");
+
+        Assert.Equal(0, await RunAsync("create"));
+
+        var created = Assert.Single(_repository.Created);
+
+        Assert.Equal("v1.5.0", created.TagName);
+        Assert.False(created.Prerelease);
+        Assert.Equal("# Novidades\n\n- Adicionar a busca.\n\n# Correções\n\n- Corrigir a busca.\n", created.Body);
+    }
+
+    [Fact]
+    public async Task O_rotulo_que_nao_serve_para_versao_falha_e_diz_o_que_usar()
+    {
+        _repository.Commit("feat: Um.");
+
+        Assert.Equal(1, await RunAsync("version", "--pre-release-label", "beta.1"));
+        Assert.Contains("O rótulo de pre-release \"beta.1\" não serve para uma versão.", Stderr,
+            StringComparison.Ordinal);
+        Assert.Contains("como beta ou rc", Stderr, StringComparison.Ordinal);
+    }
+
     /// <summary>
     /// Representa um relógio parado num instante.
     /// </summary>
