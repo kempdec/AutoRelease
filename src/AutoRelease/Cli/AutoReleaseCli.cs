@@ -97,6 +97,12 @@ internal sealed class AutoReleaseCli(CliContext context)
         Description = "O prefixo das tags de versão. Padrão: v."
     };
 
+    private readonly Option<string> _preReleaseLabel = new("--pre-release-label")
+    {
+        Description = "Gera uma pre-release com este rótulo, como beta: a próxima versão com o número seguinte "
+            + "(1.5.0-beta.1, depois 1.5.0-beta.2), marcada como pre-release, com as notas desde a tag anterior."
+    };
+
     private readonly Option<string> _projectName = new("--project-name")
     {
         Description = "O nome do projeto no título da release. Padrão: o nome do repositório."
@@ -203,7 +209,7 @@ internal sealed class AutoReleaseCli(CliContext context)
         Option[] options =
         [
             _token, _repo, _branch, _commit, _config, _version, _types, _replaces, _ignores, _showAuthor,
-            _firstVersion, _versionPrefix
+            _firstVersion, _versionPrefix, _preReleaseLabel
         ];
 
         foreach (Option option in options.Concat(extraOptions))
@@ -306,7 +312,8 @@ internal sealed class AutoReleaseCli(CliContext context)
         string title = $"{reader.GetString("ProjectName", parseResult.GetValue(_projectName)) ?? repoName} "
             + $"{plan.TagName} ({context.Clock.GetUtcNow():yyyy-MM-dd})";
         bool draft = reader.GetBool("Draft", parseResult.GetValue(_draft));
-        bool preRelease = reader.GetBool("PreRelease", parseResult.GetValue(_preRelease));
+        bool preRelease = reader.GetBool("PreRelease", parseResult.GetValue(_preRelease))
+            || request.PreReleaseLabel is not null;
 
         if (reader.GetBool("DryRun", parseResult.GetValue(_dryRun)))
         {
@@ -544,6 +551,8 @@ internal sealed class AutoReleaseCli(CliContext context)
             Reference = ResolveReference(reader, parseResult),
             Version = reader.GetVersion("Version", parseResult.GetValue(_version), prefix),
             VersionPrefix = prefix,
+            PreReleaseLabel = ParsePreReleaseLabel(reader.GetString("PreReleaseLabel",
+                parseResult.GetValue(_preReleaseLabel))),
             FirstVersion = reader.GetVersion("FirstVersion", parseResult.GetValue(_firstVersion), prefix)
                 ?? new SemVersion(1, 0, 0),
             Rules = new ReleaseRules
@@ -631,6 +640,29 @@ internal sealed class AutoReleaseCli(CliContext context)
             : throw new AutoReleaseException(
                 $"O tipo de saída \"{value}\" não existe.",
                 $"Use um destes em OutputType: {string.Join(", ", Enum.GetNames<OutputType>())}.");
+    }
+
+    /// <summary>
+    /// Lê o rótulo da pre-release, como <c>beta</c>.
+    /// </summary>
+    /// <param name="value">O valor configurado.</param>
+    /// <returns>O rótulo, ou <see langword="null"/> quando não há (a release é uma versão final).</returns>
+    /// <exception cref="AutoReleaseException">Quando o rótulo não é um identificador de pre-release válido.</exception>
+    private static string? ParsePreReleaseLabel(string? value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        bool valid = value.All(character => char.IsAsciiLetterOrDigit(character) || character == '-')
+            && !value.All(char.IsAsciiDigit);
+
+        return valid
+            ? value
+            : throw new AutoReleaseException(
+                $"O rótulo de pre-release \"{value}\" não serve para uma versão.",
+                "Use só letras, números e hífen, com ao menos uma letra, como beta ou rc, em PreReleaseLabel.");
     }
 
     /// <summary>

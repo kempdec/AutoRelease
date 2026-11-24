@@ -27,6 +27,7 @@ O que ele garante:
 - [Linha de comando](#linha-de-comando)
 - [Escrevendo commits](#escrevendo-commits)
 - [Como a versão e as notas são calculadas](#como-a-versão-e-as-notas-são-calculadas)
+- [Versões de teste (beta)](#versões-de-teste-beta)
 - [Configuração](#configuração)
 - [Conferindo as mensagens de commit](#conferindo-as-mensagens-de-commit)
 - [Saída e códigos de saída](#saída-e-códigos-de-saída)
@@ -138,9 +139,9 @@ Os operadores ficam colados ao tipo, antes dos dois-pontos, e podem ser combinad
 
 ## Como a versão e as notas são calculadas
 
-**A versão anterior** é a maior tag com o prefixo do projeto (`v`, por padrão) que é uma versão semântica. **Os
-commits** são os que o commit da release tem e o da tag não. Sem tag, vale a história inteira e a versão
-`FirstVersion`.
+**A versão anterior** é a maior tag com o prefixo do projeto (`v`, por padrão) que é uma versão semântica e final: as
+pre-releases (como `v1.5.0-beta.1`) não contam como anterior de uma versão final. **Os commits** são os que o commit da
+release tem e o da tag não. Sem tag, vale a história inteira e a versão `FirstVersion`.
 
 **O salto** vem dos commits que contam (os ignorados não contam):
 
@@ -150,10 +151,39 @@ commits** são os que o commit da release tem e o da tag não. Sem tag, vale a h
 | Algum do **primeiro tipo** de `Types` (`feat`, por padrão) | `minor` (1.4.2 → 1.5.0) |
 | Qualquer outro | `patch` (1.4.2 → 1.4.3) |
 
-Depois de uma pre-release (como `2.0.0-beta.1`), a próxima versão é a estável dela (`2.0.0`).
+Depois de uma pre-release (como `2.0.0-beta.1`), a próxima versão final é a estável dela (`2.0.0`), ou mais, se os
+commits desde a última final pedirem.
 
 **As notas** têm um grupo por tipo, na ordem de `Types`, com um item por commit, do mais antigo ao mais novo. Um texto
 repetido entra uma vez. O commit de um tipo fora da lista vai para o grupo "Outros", no fim.
+
+## Versões de teste (beta)
+
+Quando uma versão fecha para teste, ela já ganha o número de verdade, como `v1.5.0-beta.1`. Informe o rótulo em
+`PreReleaseLabel` (ou `--pre-release-label`):
+
+```yml
+      - name: Criar a versão de teste
+        uses: kempdec/autorelease-action@v3
+        env:
+          AutoRelease_Token: ${{ secrets.GITHUB_TOKEN }}
+          AutoRelease_PreReleaseLabel: beta
+          AutoRelease_OutputType: Version # 1.5.0-beta.1, para o Beta e a loja de teste mostrarem
+```
+
+| Tags que já existem | Commits desde a última | Sem rótulo | Com `beta` |
+| ------------------- | ---------------------- | ---------- | ---------- |
+| `v1.4.0` | um `feat` | `v1.5.0` | `v1.5.0-beta.1`, com as notas desde a `v1.4.0` |
+| `v1.4.0`, `v1.5.0-beta.1` | um `fix` | `v1.5.0`, com as notas desde a `v1.4.0` | `v1.5.0-beta.2`, com as notas desde a `v1.5.0-beta.1` |
+
+- **A versão** é a final que sairia agora, com o rótulo e o número seguinte ao maior que já existe para ela
+  (`beta.1`, `beta.2`...). Cada rótulo conta à parte: depois da `v1.5.0-beta.2`, o rótulo `rc` gera a `v1.5.0-rc.1`.
+- **As notas** da pre-release vêm desde a tag anterior, seja ela outra pre-release ou a última final.
+- **A release** é marcada como pre-release no GitHub, mesmo sem `PreRelease`.
+- **A versão final** (sem o rótulo, na subida ao ar) ignora as pre-releases: a `v1.5.0` leva as notas desde a `v1.4.0`,
+  com tudo o que veio nas betas, e uma beta não faz a final saltar para a `v1.6.0`.
+- Com `Version` informada, a pre-release é ela com o rótulo (`2.0.0` com `beta` vira `2.0.0-beta.1`); uma `Version` que
+  já é pre-release, como `2.0.0-rc.1`, vale como está.
 
 ## Configuração
 
@@ -207,6 +237,7 @@ aspas: `AutoRelease_CreateCommand__Types='feat="Novidades desta versão" fix=Cor
 | `ProjectName` | `--project-name` | o nome do repositório | O nome do projeto no título da release. |
 | `Draft` | `--draft` | `false` | Cria a release como rascunho. |
 | `PreRelease` | `--pre-release` | `false` | Marca a release como pre-release. |
+| `PreReleaseLabel` | `--pre-release-label` | nenhum | Gera a versão de teste com este rótulo, como `beta`: `1.5.0-beta.1`, depois `1.5.0-beta.2`. Veja [Versões de teste](#versões-de-teste-beta). |
 | `OutputType` | `--output-type` | `Id` | O que o `create` escreve: `Id`, `UploadUrl`, `Version`, `Tag` ou `HtmlUrl`. |
 | `DryRun` | `--dry-run` | `false` | Mostra a release que seria criada, sem criar nada. |
 | `SkipEmpty` | `--skip-empty` | `false` | Não cria a release quando todos os commits desde a anterior são ignorados. |
