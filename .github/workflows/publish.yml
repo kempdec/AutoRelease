@@ -29,6 +29,8 @@ jobs:
       contents: write
       # Publicar o pacote no GitHub Packages.
       packages: write
+      # Entrar no NuGet sem chave guardada (Trusted Publishing): o NuGet troca o token do GitHub por uma chave de uma hora.
+      id-token: write
 
     env:
       TOOL: src/AutoRelease/bin/Release/net10.0/KempDec.AutoRelease.dll
@@ -63,9 +65,18 @@ jobs:
 
       # O pacote sai antes da release: se a release falhar, rodar de novo cria a mesma versão, e o --skip-duplicate
       # pula o pacote que já subiu. Na ordem contrária, uma falha no envio deixava uma release sem pacote.
+      # Sem chave guardada, que vence (a de antes venceu e barrou a 2.0.0 em 13/11/2026): a regra de Trusted Publishing do
+      # pacote no nuget.org confia neste repositório e neste workflow, e o login devolve uma chave que vale uma hora. A
+      # variável NUGET_USER é o nome do perfil dono do pacote no nuget.org (não é segredo).
+      - name: Entrar no NuGet
+        id: nuget
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
       - name: Publicar o pacote no NuGet
         run: >-
-          dotnet nuget push "published/*.nupkg" --api-key ${{ secrets.NUGET_TOKEN }}
+          dotnet nuget push "published/*.nupkg" --api-key ${{ steps.nuget.outputs.NUGET_API_KEY }}
           --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Publicar o pacote no GitHub Packages
